@@ -1,0 +1,16 @@
+@import "tailwindcss";
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+/* [data-theme="dark"] {
+    --color-primary: #ffffff;
+    --color-secondary: #ffffff;
+    --color-accent: #ff1e1e;
+}
+
+[data-theme="light"] {
+    --color-primary: #ffffff;
+    --color-secondary: #f9f9f9;
+    --color-accent: #61baff;
+} */

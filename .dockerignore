@@ -1,0 +1,11 @@
+.env
+.DS_Store
+*.sqlite3
+node_modules/
+*.log
+*.tmp
+*.bak
+.idea/
+.vscode/
+*.swp
+*.swo
