@@ -22,7 +22,8 @@ class PostRecource extends JsonResource
             'category_id' => $this->category_id,
             'category_name' => $this->category->title,
             'title' => $this->title,
-            'content'=>$this->when(Route::currentRouteName() === 'posts.show', $this->content),
+            //'content'=>$this->when(Route::currentRouteName() === 'posts.show', $this->content),
+            'content'=>$this->content,
             'created_at' => Carbon::parse($this->created_at,('Y-m-d H:i:s'))->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at,('Y-m-d H:i:s'))->toDateTimeString()
         ];

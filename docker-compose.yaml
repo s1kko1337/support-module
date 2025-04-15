@@ -19,7 +19,7 @@ services:
     container_name: php-cli
     volumes:
       - ./:/app
-    command: /bin/sh -c "php artisan config:clear && php artisan cache:clear"
+    command: /bin/sh -c "rm -rf vendor/ && composer install && php artisan config:clear && php artisan cache:clear"
     networks:
       - app-network
 

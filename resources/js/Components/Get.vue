@@ -1,7 +1,7 @@
 
 <template>
     <div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Информационная панель</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Панель управления</h2>
 
         <!-- Предупреждение о необходимости авторизации -->
         <div v-if="!authStore.isAuthenticated" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
@@ -466,7 +466,7 @@ const activeTab = ref('dashboard');
 const loading = ref(false);
 const error = ref('');
 
-// ============= Статистика =============
+// Статистика
 const stats = reactive({
     categories: 0,
     categoriesGrowth: 12,
@@ -535,7 +535,7 @@ const getActivityIconClass = (type) => {
     }
 };
 
-// ============= Категории =============
+//  Категории
 const categories = ref([]);
 const categorySearch = ref('');
 const categoryLoading = ref(false);
@@ -750,7 +750,7 @@ const deleteCategory = async (id) => {
     }
 };
 
-// ============= Посты =============
+// Посты
 const posts = ref([]);
 const postLoading = ref(false);
 const postPage = ref(1);

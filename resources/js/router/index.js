@@ -4,6 +4,7 @@ import Register from '../Components/Register.vue';
 import Login from '../Components/Login.vue';
 import App from '../Components/App.vue';
 import Get from '../Components/Get.vue';
+import TermsOfUse from '../Components/TermsOfUse.vue';
 
 const routes = [
     {
@@ -25,6 +26,11 @@ const routes = [
         path: '/get',
         name: 'get',
         component: Get,
+    },
+    {
+        path: '/termsofuse',
+        name: 'termsofuse',
+        component: TermsOfUse,
     },
 ];
 
