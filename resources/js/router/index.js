@@ -1,32 +1,36 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { onMounted } from 'vue';
+import {createRouter, createWebHashHistory} from 'vue-router';
 
+import Register from '../Components/Register.vue';
+import Login from '../Components/Login.vue';
 import App from '../Components/App.vue';
-import { useRouterStore } from "../stores/routerStore.js";
-
-
+import Get from '../Components/Get.vue';
 
 const routes = [
     {
         path: '/',
-        name: 'Main',
+        name: 'app',
         component: App,
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: Login,
+    },
+    {
+        path: '/register',
+        name: 'register',
+        component: Register,
+    },
+    {
+        path: '/get',
+        name: 'get',
+        component: Get,
     },
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
-});
-
-router.beforeEach((to, from, next) => {
-    const routerStore = useRouterStore();
-    if (to.path === '/') {
-        routerStore.setLastVisitedRoute('/');
-    } else {
-        routerStore.setLastVisitedRoute(to.path);
-    }
-    next();
 });
 
 export default router;

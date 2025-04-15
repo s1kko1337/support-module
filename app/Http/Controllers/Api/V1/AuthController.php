@@ -14,7 +14,13 @@ class AuthController extends Controller
 {
     public function register(StoreUserRequest $request)
     {
-        return User::create($request->validated());
+        $user = User::create($request->validated());
+
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken("Token of user: {$user->name}")->plainTextToken,
+        ]);
+
     }
     public function login(LoginUserRequest $request)
     {
@@ -25,14 +31,18 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        $user->tokens()->delete();
         return response()->json([
             'user' => $user,
             'token' => $user->createToken("Token of user: {$user->name}")->plainTextToken,
         ]);
     }
 
-    public function logout()
-    {
-
+    public function logout() {
+        Auth::user()->currentAccessToken()->delete();
+        return response()->json([
+            'message' => 'Logged out, token removed',
+        ]);
+        Auth::logout();
     }
 }
