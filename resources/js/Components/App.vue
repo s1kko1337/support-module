@@ -17,7 +17,12 @@
         <nav class="bg-white shadow-md">
             <div class="container mx-auto px-4 py-3">
                 <div class="flex justify-between items-center">
-                    <div class="text-xl font-bold text-indigo-600">SupportApp</div>
+                    <router-link
+                        :to="{name:'todo'}"
+                        class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
+                    >
+                    <span class="text-xl font-bold text-indigo-600">SupportApp</span>
+                    </router-link>
                     <div class="space-x-6">
                         <!-- Кнопки для гостей -->
                         <template v-if="!authStore.isAuthenticated">
@@ -48,7 +53,11 @@
 
                             <!-- Информация о пользователе -->
                             <span v-if="authStore.user" class="ml-4 px-3 py-2 bg-indigo-50 rounded-lg text-indigo-700">
-                                {{ authStore.user.email || authStore.user.name }}
+                                <router-link
+                                    :to="{name:'passwordChange'}"
+                                    class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
+                                >{{ authStore.user.email || authStore.user.name }}
+                            </router-link>
                             </span>
                         </template>
                     </div>
@@ -104,7 +113,7 @@ const handleLogout = async () => {
 };
 
 // Перенаправление на требуемую страницу в зависимости от аутентификации
-const redirectIfNeeded = () => {
+const redirectIfNeeded = async () => {
     const currentRoute = router.currentRoute.value;
 
     // Если пользователь авторизован и находится на странице входа или регистрации,
@@ -115,10 +124,24 @@ const redirectIfNeeded = () => {
     }
 
     // Если пользователь не авторизован и пытается получить доступ к защищенным маршрутам
-    if (!authStore.isAuthenticated && currentRoute.meta.requiresAuth) {
+    if (!authStore.isAuthenticated && currentRoute.meta?.requiresAuth) {
         router.push({name: 'login'});
     }
+
+    // Если маршрут требует верификации email, проверяем статус
+    if (authStore.isAuthenticated && currentRoute.meta?.requiresVerification) {
+        try {
+            const verificationStatus = await authStore.checkVerificationStatus();
+            if (verificationStatus && !verificationStatus.verified) {
+                // Если email не подтвержден, перенаправляем на страницу верификации
+                router.push({name: 'emailVerification'});
+            }
+        } catch (error) {
+            console.error('Error checking verification status:', error);
+        }
+    }
 };
+
 
 // Инициализация при монтировании компонента
 onMounted(async () => {

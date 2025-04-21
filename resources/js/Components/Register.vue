@@ -208,7 +208,7 @@ const handleRegister = async () => {
   });
 
   if (success) {
-    router.push({name: 'get'});
+    router.push({name: 'emailVerification'});
   }
 };
 </script>

@@ -21,7 +21,8 @@ export const useAuthStore = defineStore('auth', {
 
     getters: {
         isAuthenticated: (state) => !!state.token,
-        userEmail: (state) => state.user?.email
+        userEmail: (state) => state.user?.email,
+        isVerified: (state) => !!state.user?.email_verified_at
     },
 
     actions: {
@@ -152,10 +153,59 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
+        async checkVerificationStatus() {
+            if (!this.token) return null;
+
+            this.loading = true;
+            this.error = null;
+
+            try {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+
+                await axios.get('/sanctum/csrf-cookie');
+
+                const response = await axios.get('/api/v1/email/verify');
+
+                if (response.data && response.data.verified) {
+                    await this.fetchUser();
+                }
+
+                return response.data;
+            } catch (error) {
+                console.error('Verification status check error:', error);
+                this.error = error.response?.data?.message || 'Ошибка при проверке статуса верификации';
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async resendVerificationEmail() {
+            if (!this.token) return null;
+
+            this.loading = true;
+            this.error = null;
+
+            try {
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
+
+                await axios.get('/sanctum/csrf-cookie');
+
+                const response = await axios.post('/api/v1/email/verification-notification');
+
+                return response.data;
+            } catch (error) {
+                console.error('Resend verification email error:', error);
+                this.error = error.response?.data?.message || 'Ошибка при отправке письма для подтверждения';
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
         async logout() {
             try {
                 if (this.token) {
-                    // Устанавливаем Authorization заголовок для запроса вы��ода
+                    // Устанавливаем Authorization заголовок для запроса вывода
                     axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
 
                     // Получаем CSRF-cookie
@@ -173,7 +223,6 @@ export const useAuthStore = defineStore('auth', {
         }
     },
 
-    // Автоматическое сохранение состояния в localStorage
     persist: {
         enabled: true,
         strategies: [

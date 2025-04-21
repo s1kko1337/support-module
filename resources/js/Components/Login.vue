@@ -39,7 +39,7 @@
                 </div>
 
                 <div>
-                    <a href="#" class="text-sm text-indigo-600 hover:underline">Забыли пароль?</a>
+                    <router-link :to="{name:'passwordRequest'}" class="text-sm text-indigo-600 hover:underline">Забыли пароль?</router-link>
                 </div>
             </div>
 
