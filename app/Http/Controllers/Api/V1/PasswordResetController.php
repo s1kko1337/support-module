@@ -10,6 +10,8 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -55,5 +57,40 @@ class PasswordResetController extends Controller
             'message' => 'Произошла ошибка при сбросе пароля.',
             'error' => $status,
         ], 500);
+    }
+
+    /**
+     * Change password for authenticated user
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function change(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string'],
+        ]);
+
+        $user = Auth::user();
+
+        // Проверяем, что текущий пароль соответствует тому, что есть в базе
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Текущий пароль указан неверно.',
+                'errors' => [
+                    'current_password' => ['Текущий пароль указан неверно.']
+                ]
+            ], 422);
+        }
+
+        // Обновляем пароль
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Пароль успешно изменен',
+        ], 200);
     }
 }

@@ -47,6 +47,7 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(functio
 
 // Маршруты, требующие верифицированного email
 Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified'])->group(function () {
+    Route::post('password/change', [PasswordResetController::class, 'change']);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('posts', PostController::class);
 });
