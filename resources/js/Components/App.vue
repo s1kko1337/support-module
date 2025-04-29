@@ -41,7 +41,7 @@
                         <!-- Кнопки для авторизованных пользователей -->
                         <template v-else>
                             <router-link
-                                :to="{name:'get'}"
+                                :to="{name:'dashboard'}"
                                 class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
                             >Панель управления
                             </router-link>
@@ -141,7 +141,6 @@ const redirectIfNeeded = async () => {
         }
     }
 };
-
 
 // Инициализация при монтировании компонента
 onMounted(async () => {

@@ -2,8 +2,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Register from '../Components/Register.vue';
 import Login from '../Components/Login.vue';
-import App from '../Components/App.vue';
-import Get from '../Components/Get.vue';
 import TermsOfUse from '../Components/TermsOfUse.vue';
 import EmailVerification from "../Components/EmailVerification.vue";
 import EmailVerifyLink from "../Components/EmailVerifyLink.vue";
@@ -12,6 +10,9 @@ import ToDo from "../Components/ToDo.vue";
 import PasswordResetRequest from "../Components/PasswordResetRequest.vue";
 import PasswordChange from "../Components/PasswordChange.vue";
 import PasswordResetForm from "../Components/PasswordResetForm.vue";
+import Dashboard from "../Components/Dashboard/Dashboard.vue";
+import Categories from "../Components/Dashboard/Categories.vue";
+import Posts from "../Components/Dashboard/Posts.vue";
 
 const routes = [
     // {
@@ -37,9 +38,27 @@ const routes = [
         component: Register,
     },
     {
-        path: '/get',
-        name: 'get',
-        component: Get,
+        path: '/dashboard',
+        name: 'dashboard',
+        component: Dashboard,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/dashboard/categories',
+        name: 'categories',
+        component: Categories,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/dashboard/posts',
+        name: 'posts',
+        component: Posts,
         meta: {
             requiresAuth: true,
             requiresVerification: true
@@ -76,7 +95,6 @@ const routes = [
             auth: false
         }
     },
-
     {
         path: '/profile/password',
         name: 'passwordChange',
@@ -137,7 +155,7 @@ router.beforeEach(async (to, from, next) => {
 
     // Если пользователь авторизован и пытается перейти на страницу входа или регистрации
     if (authStore.isAuthenticated && (to.name === 'login' || to.name === 'register')) {
-        next({ name: 'get' });
+        next({ name: 'dashboard' });
         return;
     }
 

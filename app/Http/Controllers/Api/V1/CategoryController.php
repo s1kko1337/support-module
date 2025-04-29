@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\StoreCategoryEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\Api\V1\CategoryRecource;
 use App\Models\Category;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -21,11 +24,45 @@ class CategoryController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @throws Exception
+     */
+    /**
+     * Store a newly created resource in storage.
+     * @throws Exception
      */
     public function store(StoreCategoryRequest $request)
     {
-        return new CategoryRecource(Category::create($request->all()));
+        try {
+            Log::info('Начало создания категории', ['data' => $request->validated()]);
+
+            $data = $request->validated();
+            $category = Category::create($data);
+
+            Log::info('Подготовка к отправке события StoreCategoryEvent', ['category_id' => $category->id]);
+
+            try {
+                event(new StoreCategoryEvent($category));
+                Log::info('Событие StoreCategoryEvent успешно отправлено', ['category_id' => $category->id]);
+            } catch (Exception $e) {
+                Log::error('Ошибка при отправке события StoreCategoryEvent', [
+                    'category_id' => $category->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
+            // Возвращаем данные через ресурс без обертки
+            return new CategoryRecource($category);
+        } catch (Exception $e) {
+            Log::error('Ошибка при создании категории', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
+
+
 
     /**
      * Display the specified resource.

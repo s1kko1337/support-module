@@ -1,8 +1,5 @@
-
 <template>
     <div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Панель управления</h2>
-
         <!-- Предупреждение о необходимости авторизации -->
         <div v-if="!authStore.isAuthenticated" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
             <p class="font-bold">Доступ ограничен</p>
@@ -13,244 +10,20 @@
             <!-- Вкладки для переключения между разделами -->
             <div class="border-b border-gray-200 mb-8">
                 <nav class="flex -mb-px">
-                    <button
-                        @click="activeTab = 'dashboard'"
-                        class="py-4 px-6 border-b-2 font-medium text-sm"
-                        :class="activeTab === 'dashboard' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    <router-link
+                        :to="{name:'dashboard'}"
+                        class="py-4 px-6  font-medium text-sm hover:bg-indigo-50 transition duration-200"
                     >
-                        Статистика
-                    </button>
-                    <button
-                        @click="activeTab = 'categories'"
-                        class="py-4 px-6 border-b-2 font-medium text-sm"
-                        :class="activeTab === 'categories' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        <span class="text-xl  text-gray-700">На главную</span>
+                    </router-link>
+                    <router-link
+                        :to="{name:'categories'}"
+                        class="py-4 px-6 font-medium text-sm hover:bg-indigo-50 transition duration-200"
                     >
-                        Категории
-                    </button>
-                    <button
-                        @click="activeTab = 'posts'"
-                        class="py-4 px-6 border-b-2 font-medium text-sm"
-                        :class="activeTab === 'posts' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                    >
-                        Посты
-                    </button>
+                        <span class="text-xl  text-gray-700">Категории</span>
+                    </router-link>
                 </nav>
             </div>
-
-            <!-- Вкладка со статистикой -->
-            <div v-if="activeTab === 'dashboard'">
-                <!-- Карточки со статистикой -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg shadow-md border border-blue-200">
-                        <div class="text-blue-700 text-lg font-semibold mb-2">Категории</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ stats.categories }}</div>
-                        <div class="text-blue-600 mt-4 text-sm">↑ {{ stats.categoriesGrowth }}% за последний месяц</div>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg shadow-md border border-green-200">
-                        <div class="text-green-700 text-lg font-semibold mb-2">Посты</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ stats.posts }}</div>
-                        <div class="text-green-600 mt-4 text-sm">↑ {{ stats.postsGrowth }}% за последний месяц</div>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg shadow-md border border-purple-200">
-                        <div class="text-purple-700 text-lg font-semibold mb-2">Просмотры</div>
-                        <div class="text-3xl font-bold text-gray-800">{{ stats.views }}</div>
-                        <div class="text-purple-600 mt-4 text-sm">↑ {{ stats.viewsGrowth }}% за последний месяц</div>
-                    </div>
-                </div>
-
-                <!-- График активности -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Активность за последний месяц</h3>
-                    <div class="h-64 bg-gray-50 rounded border border-gray-200 p-4">
-                        <!-- Здесь можно добавить график активности с использованием библиотеки Chart.js или подобной -->
-                        <div class="flex h-full items-end space-x-2">
-                            <div v-for="(value, index) in activityData" :key="index"
-                                 class="bg-indigo-500 rounded-t w-full"
-                                 :style="{ height: `${value}%` }"
-                                 :title="`День ${index + 1}: ${value}%`">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Последние действия -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                        <h3 class="text-lg font-semibold text-gray-700">Последние действия</h3>
-                    </div>
-                    <ul class="divide-y divide-gray-200">
-                        <li v-for="(activity, index) in recentActivities" :key="index" class="p-6">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0">
-                                    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full"
-                                          :class="getActivityIconClass(activity.type)">
-                                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getActivityIcon(activity.type)" />
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-900">{{ activity.description }}</p>
-                                    <p class="text-sm text-gray-500">{{ formatDate(activity.date) }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Вкладка с категориями -->
-            <div v-if="activeTab === 'categories'">
-                <!-- Форма создания категории -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Создать новую категорию</h3>
-                    <form @submit.prevent="createCategory" class="space-y-4">
-                        <div>
-                            <label for="category-title" class="block text-sm font-medium text-gray-700 mb-1">Название категории</label>
-                            <input
-                                type="text"
-                                id="category-title"
-                                v-model="newCategory.title"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                placeholder="Введите название категории"
-                                required
-                            >
-                        </div>
-                        <div>
-                            <label for="category-description" class="block text-sm font-medium text-gray-700 mb-1">Описание</label>
-                            <textarea
-                                id="category-description"
-                                v-model="newCategory.description"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                placeholder="Введите описание категории"
-                                rows="3"
-                            ></textarea>
-                        </div>
-                        <div class="flex justify-end">
-                            <button
-                                type="submit"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                                :disabled="categoryLoading"
-                            >
-                                <span v-if="categoryLoading">Создание...</span>
-                                <span v-else>Создать категорию</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Список категорий -->
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-700">Категории</h3>
-                        <div class="flex items-center">
-                            <input
-                                type="text"
-                                v-model="categorySearch"
-                                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                placeholder="Поиск категорий"
-                            >
-                        </div>
-                    </div>
-
-                    <!-- Индикатор загрузки категорий -->
-                    <div v-if="categoryLoading" class="flex justify-center my-8">
-                        <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </div>
-
-                    <!-- Таблица категорий -->
-                    <div v-else-if="filteredCategories.length > 0" class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Описание</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Кол-во постов</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата создания</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="category in filteredCategories" :key="category.id">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#{{ category.id }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ category.title }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-700">
-                                    <div class="max-w-xs truncate">{{ category.description || 'Нет описания' }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ category.postCount }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatDate(category.created_at) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                    <button @click="editCategory(category)" class="text-indigo-600 hover:text-indigo-900 mr-3">Редактировать</button>
-                                    <button @click="deleteCategory(category.id)" class="text-red-600 hover:text-red-900">Удалить</button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Нет категорий -->
-                    <div v-else class="text-center py-12">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <p class="mt-2 text-gray-600">{{ categorySearch ? 'Категории не найдены' : 'Нет категорий' }}</p>
-                    </div>
-
-                    <!-- Модальное окно редактирования категории -->
-                    <div v-if="showCategoryModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-                        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Редактирование категории</h3>
-                            <form @submit.prevent="updateCategory" class="space-y-4">
-                                <div>
-                                    <label for="edit-category-title" class="block text-sm font-medium text-gray-700 mb-1">Название категории</label>
-                                    <input
-                                        type="text"
-                                        id="edit-category-title"
-                                        v-model="editingCategory.title"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        required
-                                    >
-                                </div>
-                                <div>
-                                    <label for="edit-category-description" class="block text-sm font-medium text-gray-700 mb-1">Описание</label>
-                                    <textarea
-                                        id="edit-category-description"
-                                        v-model="editingCategory.description"
-                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                                        rows="3"
-                                    ></textarea>
-                                </div>
-                                <div class="flex justify-end space-x-3">
-                                    <button
-                                        type="button"
-                                        @click="showCategoryModal = false"
-                                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-                                    >
-                                        Отмена
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                                        :disabled="categoryLoading"
-                                    >
-                                        <span v-if="categoryLoading">Сохранение...</span>
-                                        <span v-else>Сохранить</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вкладка с постами -->
-            <div v-if="activeTab === 'posts'">
                 <!-- Форма создания поста -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">Создать новый пост</h3>
@@ -448,18 +221,22 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </template>
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, computed } from 'vue';
-import { useAuthStore } from '../Stores/auth';
+import { ref, reactive, onMounted,onUnmounted, watch, computed } from 'vue';
+import { useAuthStore } from '../../Stores/auth.js';
 import axios from 'axios';
 
 // Состояние аутентификации
 const authStore = useAuthStore();
+
+const echoChannels = ref({
+    posts: null,
+    categories: null
+});
 
 // Общее состояние компонента
 const activeTab = ref('dashboard');
@@ -482,25 +259,10 @@ const activityData = ref(Array.from({ length: 30 }, () => Math.floor(Math.random
 // Последние действия пользователей
 const recentActivities = ref([
     {
-        type: 'category',
-        description: 'Создана новая категория "Новости"',
-        date: new Date(Date.now() - 1000 * 60 * 60 * 2)
-    },
-    {
         type: 'post',
         description: 'Опубликован новый пост "Добро пожаловать в блог"',
         date: new Date(Date.now() - 1000 * 60 * 60 * 5)
     },
-    {
-        type: 'edit',
-        description: 'Отредактирована категория "Руководства"',
-        date: new Date(Date.now() - 1000 * 60 * 60 * 24)
-    },
-    {
-        type: 'delete',
-        description: 'Удален пост "Тестовая публикация"',
-        date: new Date(Date.now() - 1000 * 60 * 60 * 48)
-    }
 ]);
 
 // Иконки для действий
@@ -534,6 +296,88 @@ const getActivityIconClass = (type) => {
             return 'bg-gray-500';
     }
 };
+
+// Функция для инициализации подписок
+const initEchoChannels = () => {
+    if (!authStore.isAuthenticated) return;
+
+    // Закрываем существующие подписки, если они есть
+    closeEchoChannels();
+
+    echoChannels.value.posts = window.Echo.channel('store-post')
+        // Слушаем событие PostCreated (или используйте имя в соответствии с вашим серверным кодом)
+        .listen('.store-post', (data) => {
+            console.log('Новый пост получен:', data);
+            // Обработка события создания поста
+            handlePostCreated(data);
+        })
+};
+
+// Закрытие подписок при размонтировании компонента
+const closeEchoChannels = () => {
+    // Отписываемся от всех каналов
+    if (echoChannels.value.posts) {
+        window.Echo.leave('store-post');
+        echoChannels.value.posts = null;
+    }
+};
+
+// Обработчики событий
+const handlePostCreated = (data) => {
+    // Предполагаем, что сервер отправляет данные поста в корне объекта или в свойстве data.post
+    const post = data.post || data;
+
+    if (!post || !post.id) {
+        console.error('Получены некорректные данные поста:', data);
+        return;
+    }
+
+    // Проверяем, не существует ли уже такой пост (избегаем дубликатов)
+    if (posts.value.some(p => p.id === post.id)) {
+        return;
+    }
+
+    // Вставляем новый пост в начало списка
+    posts.value.unshift(post);
+
+    // Если у нас активна фильтрация по категории, и пост не соответствует фильтру,
+    // он автоматически будет скрыт благодаря computed-свойству filteredPosts
+
+    // Обновляем счетчик
+    stats.posts++;
+
+    // Обновляем счетчик постов в категории, если категория существует
+    const categoryIndex = categories.value.findIndex(c => c.id == post.category_id);
+    if (categoryIndex !== -1) {
+        categories.value[categoryIndex].postCount++;
+    }
+
+    // Добавляем в историю активности
+    addActivity('post', `Получен новый пост: "${post.title}"`);
+};
+
+const handlePostUpdated = (post) => {
+    // Находим и обновляем измененный пост
+    const index = posts.value.findIndex(p => p.id === post.id);
+    if (index !== -1) {
+        posts.value[index] = post;
+        addActivity('edit', `Обновлен пост: "${post.title}"`);
+    }
+};
+
+const handlePostDeleted = (postId) => {
+    // Находим и удаляем пост
+    const index = posts.value.findIndex(p => p.id === postId);
+    if (index !== -1) {
+        const postTitle = posts.value[index].title;
+        posts.value.splice(index, 1);
+        stats.posts--;
+        addActivity('delete', `Удален пост: "${postTitle}"`);
+    }
+};
+
+
+
 
 //  Категории
 const categories = ref([]);
@@ -821,7 +665,6 @@ const loadPosts = async (page = 1) => {
             postTotalPages.value = response.data.last_page || 1;
             stats.posts = response.data.total || posts.value.length;
         } else {
-            // Демо-данные для тестирования
             posts.value = Array.from({ length: 10 }, (_, i) => ({
                 id: i + 1,
                 title: `Пост ${i + 1}`,
@@ -1087,18 +930,26 @@ const addActivity = (type, description) => {
 onMounted(async () => {
     if (authStore.isAuthenticated) {
         await Promise.all([
+            initEchoChannels(),
             loadCategories(),
             loadPosts()
         ]);
     }
 });
 
+
+onUnmounted(() => {
+    closeEchoChannels();
+});
+
 // Следим за изменением статуса аутентификации
 watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     if (isAuthenticated) {
+        initEchoChannels();
         loadCategories();
         loadPosts();
     } else {
+        closeEchoChannels();
         categories.value = [];
         posts.value = [];
         error.value = '';

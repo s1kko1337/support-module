@@ -133,7 +133,7 @@ const handleLogin = async () => {
         });
 
         if (success) {
-            router.push({ name: 'get' });
+            await router.push({name: 'dashboard'});
         }
     } catch (error) {
         console.error('Login component error:', error);

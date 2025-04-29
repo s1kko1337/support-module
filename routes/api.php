@@ -41,7 +41,7 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(functio
 
     // Повторная отправка письма для верификации
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
-        ->middleware('throttle:6,1')
+        ->middleware('throttle:25,1')
         ->name('verification.send');
 });
 

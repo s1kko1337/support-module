@@ -136,7 +136,7 @@ const checkVerificationStatus = async () => {
 
     if (!authStore.isAuthenticated) {
         error.value = true;
-        errorMessage.value = 'Для проверки статуса подтверждения ��еобходимо войти в систему.';
+        errorMessage.value = 'Для проверки статуса подтверждения необходимо войти в систему.';
         loading.value = false;
         return;
     }
@@ -186,7 +186,7 @@ const resendVerification = async () => {
 
 // Перенаправление в панель управления
 const redirectToDashboard = () => {
-    router.push({ name: 'get' });
+    router.push({ name: 'dashboard' });
 };
 
 // Перенаправление на страницу входа

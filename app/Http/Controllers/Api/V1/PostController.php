@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\StorePostEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
@@ -23,7 +24,12 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        return new PostRecource(Post::create($request->all()));
+        $data = $request->validated();
+        $post = Post::create($data);
+
+        broadcast(new StorePostEvent($post))->toOthers();
+
+        return PostRecource::make($post)->resolve();
     }
 
     /**
