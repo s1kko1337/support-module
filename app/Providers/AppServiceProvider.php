@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CustomToken;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(CustomToken::class);
+
         VerifyEmail::createUrlUsing(function ($notifiable) {
             $frontend_url = 'http://localhost'; //В проде убрать
 

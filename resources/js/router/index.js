@@ -1,15 +1,15 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
-import Register from '../Components/Register.vue';
-import Login from '../Components/Login.vue';
+import Register from '../Components/Auth/Register.vue';
+import Login from '../Components/Auth/Login.vue';
 import TermsOfUse from '../Components/TermsOfUse.vue';
-import EmailVerification from "../Components/EmailVerification.vue";
-import EmailVerifyLink from "../Components/EmailVerifyLink.vue";
+import EmailVerification from "../Components/Mail/EmailVerification.vue";
+import EmailVerifyLink from "../Components/Mail/EmailVerifyLink.vue";
 import { useAuthStore } from '../Stores/auth';
 import ToDo from "../Components/ToDo.vue";
-import PasswordResetRequest from "../Components/PasswordResetRequest.vue";
-import PasswordChange from "../Components/PasswordChange.vue";
-import PasswordResetForm from "../Components/PasswordResetForm.vue";
+import PasswordResetRequest from "../Components/Auth/PasswordResetRequest.vue";
+import PasswordChange from "../Components/Auth/PasswordChange.vue";
+import PasswordResetForm from "../Components/Auth/PasswordResetForm.vue";
 import Dashboard from "../Components/Dashboard/Dashboard.vue";
 import Categories from "../Components/Dashboard/Categories.vue";
 import Posts from "../Components/Dashboard/Posts.vue";

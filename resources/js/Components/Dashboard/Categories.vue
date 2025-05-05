@@ -361,6 +361,7 @@ const editCategory = (category) => {
 };
 
 // Обновление категории
+// Обновление категории
 const updateCategory = async () => {
     if (!authStore.isAuthenticated || !editingCategory.id) return;
 
@@ -377,19 +378,17 @@ const updateCategory = async () => {
             description: editingCategory.description
         });
 
-        if (response.data && response.data.data) {
-            // Обновляем категорию в списке
-            const index = categories.value.findIndex(c => c.id === editingCategory.id);
-            if (index !== -1) {
-                const updatedCategory = {
-                    ...categories.value[index],
-                    title: editingCategory.title,
-                    description: editingCategory.description
-                };
-                categories.value.splice(index, 1, updatedCategory);
-            }
+        // Обновляем категорию в списке независимо от структуры ответа
+        const index = categories.value.findIndex(c => c.id === editingCategory.id);
+        if (index !== -1) {
+            // Сохраняем существующие поля и обновляем только title и description
+            categories.value[index] = {
+                ...categories.value[index],
+                title: editingCategory.title,
+                description: editingCategory.description
+            };
 
-            // Закрываем модальное окно
+            // Закрываем модальное окно только при успешном обновлении
             showCategoryModal.value = false;
         }
     } catch (err) {

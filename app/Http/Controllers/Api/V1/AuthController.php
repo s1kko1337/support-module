@@ -10,7 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
-
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
@@ -23,11 +24,16 @@ class AuthController extends Controller
     public function register(StoreUserRequest $request): JsonResponse
     {
         $user = User::create($request->validated());
+        $role = Role::findByName('student');
+        $user->assignRole($role);
+
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
 
         event(new Registered($user));
         return response()->json([
             'user' => $user,
-            'token' => $user->createToken("Token of user: {$user->name}")->plainTextToken,
+            //'role' => $role,
+            'token' => $user->createToken("Token of user: {$user->name}"/*$permissions*/)->plainTextToken,
         ]);
 
     }
@@ -48,10 +54,11 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
         $user->tokens()->delete();
         return response()->json([
             'user' => $user,
-            'token' => $user->createToken("Token of user: {$user->name}")->plainTextToken,
+            'token' => $user->createToken("Token of user: {$user->name}",$permissions)->plainTextToken,
         ]);
     }
 
