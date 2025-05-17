@@ -1,18 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\EmailVerificationController;
-use App\Http\Controllers\Api\V1\PasswordResetController;
+use App\Http\Controllers\Api\V1\CertificationController;
+use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\SubjectsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
-// Маршрут для получения данных пользователя
-Route::get('/user', static function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 // Публичные маршруты
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
@@ -47,7 +46,13 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(functio
 
 // Маршруты, требующие верифицированного email
 Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'can:use-Api'])->group(function () {
+    Route::get('/user', static function (Request $request) {
+        return $request->user();});
     Route::post('password/change', [PasswordResetController::class, 'change']);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('posts', PostController::class);
+    Route::apiResource('groups', GroupController::class);
+    Route::apiResource('events', EventController::class);
+    Route::apiResource('subjects', SubjectsController::class);
+    Route::apiResource('certifications', CertificationController::class);
 });

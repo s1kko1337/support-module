@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Http\Resources\Api\V1\PostRecource;
+use App\Http\Resources\Api\V1\PostResource;
 use App\Models\Post;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -44,7 +44,7 @@ class StorePostEvent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'post' => PostRecource::make($this->post)->resolve(),
+            'post' => PostResource::make($this->post)->resolve(),
         ];
     }
 

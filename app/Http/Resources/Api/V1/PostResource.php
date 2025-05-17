@@ -8,8 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 //use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route;
 
-class PostRecource extends JsonResource
+class PostResource extends JsonResource
 {
+    public static $wrap = null;
     /**
      * Transform the resource into an array.
      *

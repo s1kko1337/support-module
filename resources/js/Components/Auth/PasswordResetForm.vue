@@ -190,9 +190,14 @@
 
 <script>
 import axios from 'axios';
+import {useAuthStore} from "../../Stores/auth.js";
 
 export default {
     name: 'PasswordResetForm',
+    setup(){
+        return useAuthStore().user;
+    },
+
     data() {
         return {
             token: '',
@@ -256,7 +261,6 @@ export default {
 </script>
 
 <style scoped>
-/* Анимированный фон с волнами */
 .wave-pattern {
     position: absolute;
     width: 100%;

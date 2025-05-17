@@ -176,17 +176,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Базовые стили для обеспечения корректной работы с высотой экрана */
 :root {
     --app-height: 100%;
 }
 
-/* Обеспечиваем плавное изменение тени при скролле */
 .transition-shadow {
     transition: box-shadow 0.3s ease;
 }
 
-/* Стили для улучшения прокрутки (опционально) */
 ::-webkit-scrollbar {
     width: 8px;
 }

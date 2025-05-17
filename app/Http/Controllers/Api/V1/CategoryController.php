@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Events\StoreCategoryEvent;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
-use App\Http\Resources\Api\V1\CategoryRecource;
+use App\Http\Requests\Api\V1\StoreCategoryRequest;
+use App\Http\Requests\Api\V1\UpdateCategoryRequest;
+use App\Http\Resources\Api\V1\CategoryResource;
 use App\Models\Category;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +18,7 @@ class CategoryController extends Controller
      */
     public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return CategoryRecource::collection(Category::all());
+        return CategoryResource::collection(Category::all());
     }
 
 
@@ -52,7 +52,7 @@ class CategoryController extends Controller
             }
 
             // Возвращаем данные через ресурс без обертки
-            return new CategoryRecource($category);
+            return new CategoryResource($category);
         } catch (Exception $e) {
             Log::error('Ошибка при создании категории', [
                 'error' => $e->getMessage(),
@@ -67,18 +67,18 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Category $category): CategoryRecource
+    public function show(Category $category): CategoryResource
     {
-        return new CategoryRecource($category);
+        return new CategoryResource($category);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryRequest $request, Category $category): CategoryRecource
+    public function update(UpdateCategoryRequest $request, Category $category): CategoryResource
     {
         $category->update($request->all());
-        return new CategoryRecource($category);
+        return new CategoryResource($category);
     }
 
     /**

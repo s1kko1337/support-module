@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Events\StorePostEvent;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePostRequest;
-use App\Http\Requests\UpdatePostRequest;
-use App\Http\Resources\Api\V1\PostRecource;
+use App\Http\Requests\Api\V1\StorePostRequest;
+use App\Http\Requests\Api\V1\UpdatePostRequest;
+use App\Http\Resources\Api\V1\PostResource;
 use App\Models\Post;
 
 class PostController extends Controller
@@ -16,7 +16,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        return PostRecource::collection(Post::with('category')->paginate());
+        return PostResource::collection(Post::with('category')->paginate());
     }
 
     /**
@@ -29,7 +29,7 @@ class PostController extends Controller
 
         broadcast(new StorePostEvent($post))->toOthers();
 
-        return PostRecource::make($post)->resolve();
+        return PostResource::make($post)->resolve();
     }
 
     /**
@@ -37,7 +37,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return new PostRecource($post);
+        return new PostResource($post);
     }
 
     /**
@@ -46,7 +46,7 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         $post->update($request->all());
-        return new PostRecource($post);
+        return new PostResource($post);
     }
 
     /**

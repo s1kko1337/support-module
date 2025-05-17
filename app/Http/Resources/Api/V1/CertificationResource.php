@@ -2,15 +2,12 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class CertificationResource extends JsonResource
 {
-    public static $wrap = null;
-
     /**
      * Transform the resource into an array.
      *
@@ -20,9 +17,8 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'postCount' => $this->posts()->count(),
+            'subject_id' => $this->subject_id,
+            'date'=> $this->date,
             'created_at' => Carbon::parse($this->created_at,('Y-m-d H:i:s'))->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at,('Y-m-d H:i:s'))->toDateTimeString()
         ];

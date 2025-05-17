@@ -23,7 +23,7 @@ class RoleSeeder extends Seeder
         $curatorPermission = Permission::create(['name' => 'manage', 'guard_name' => 'web']);
 
         $studentRole->givePermissionTo($basicPermission);
-        $curatorRole->givePermissionTo($curatorPermission);
+        $curatorRole->givePermissionTo($basicPermission,$curatorPermission);
         $adminRole->givePermissionTo([$basicPermission, $curatorPermission, $adminPermission]);
     }
 }
