@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PasswordResetRequest;
-use App\Http\Requests\PasswordRevokeRequest;
+use App\Http\Requests\Api\V1\Auth\PasswordResetRequest;
+use App\Http\Requests\Api\V1\Auth\PasswordRevokeRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

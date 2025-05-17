@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginUserRequest;
-use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\Api\V1\Auth\LoginUserRequest;
+use App\Http\Requests\Api\V1\StoreUserRequest;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
@@ -24,7 +22,7 @@ class AuthController extends Controller
     public function register(StoreUserRequest $request): JsonResponse
     {
         $user = User::create($request->validated());
-        $role = Role::findByName('student');
+        $role = Role::findByName('curator');
         $user->assignRole($role);
 
         $permissions = $user->getAllPermissions()->pluck('name')->toArray();
