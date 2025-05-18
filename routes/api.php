@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\CertificationController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\StudentCharacteristicsController;
+use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\SubjectsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -55,4 +57,6 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'ca
     Route::apiResource('events', EventController::class);
     Route::apiResource('subjects', SubjectsController::class);
     Route::apiResource('certifications', CertificationController::class);
+    Route::apiResource('students', StudentController::class);
+    Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
 });

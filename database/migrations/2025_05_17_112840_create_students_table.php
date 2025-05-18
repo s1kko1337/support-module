@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('phone_number');
             $table->string('citizenship')->default('Гражданство РФ');
             $table->foreignId('group_id')->constrained('groups', 'id');
-            $table->foreignId('characteristic_id')->constrained('student_characteristics', 'id');
-            $table->string('education'); //['общее среднее','среднее специальное']
-            $table->string('education_form'); //['бюджет','целевое','платное']
+            $table->foreignId('characteristic_id')->nullable()->constrained('student_characteristics', 'id');
+            $table->enum('education', ['общее среднее','среднее специальное','высшее']);
+            $table->enum('education_form',['бюджет','целевое','платное']);
             $table->timestamps();
         });
     }

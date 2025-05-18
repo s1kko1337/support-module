@@ -31,8 +31,6 @@ class SubjectsController extends Controller
         $data = $request->validated();
         $subject = Subject::create($data);
 
-        //broadcast(new StorePostEvent($post))->toOthers();
-
         return SubjectResource::make($subject)->resolve();
     }
 
@@ -60,7 +58,7 @@ class SubjectsController extends Controller
     {
         $subject->delete();
         return response()->json([
-            "message" => "Post deleted"
+            "message" => "Subject deleted"
         ],204);
     }
 }
