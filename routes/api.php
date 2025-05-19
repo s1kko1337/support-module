@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CertificationController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\StudentCertificationController;
 use App\Http\Controllers\Api\V1\StudentCharacteristicsController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\SubjectsController;
@@ -58,5 +59,10 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'ca
     Route::apiResource('subjects', SubjectsController::class);
     Route::apiResource('certifications', CertificationController::class);
     Route::apiResource('students', StudentController::class);
+    Route::prefix('students')->group(function () {
+        Route::post('/report/{id}', [StudentController::class, 'report']);
+        Route::post('/list', [StudentController::class, 'groupList']);
+    });
     Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
+    Route::apiResource('studentCertifications', StudentCertificationController::class);
 });

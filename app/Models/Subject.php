@@ -19,8 +19,8 @@ class Subject extends Model
         'hours_of_lectures',
     ];
 
-    public function certification(): HasMany
+    public function certifications(): HasMany
     {
-        return $this->hasMany(Certification::class);
+        return $this->hasMany(Certification::class,);
     }
 }

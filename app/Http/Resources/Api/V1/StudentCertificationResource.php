@@ -18,6 +18,7 @@ class StudentCertificationResource extends JsonResource
     {
         return [
             'certification_id' => $this->certification_id,
+            'certification_name' => $this->certification->subject->name,
             'student_id' => $this->student_id,
             'student_fio' => $this->student->surname . ' '
                 . $this->student->name . ' ' . $this->student->patronymic,

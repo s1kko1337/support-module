@@ -8,14 +8,11 @@ use App\Http\Requests\Api\V1\StudentCharacteristics\UpdateStudentCharacteristicR
 use App\Http\Resources\Api\V1\StudentCharacteristicResource;
 use App\Models\Student;
 use App\Models\StudentCharacteristics;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
-use PhpOffice\PhpWord\Style\Paragraph;
 use PhpOffice\PhpWord\SimpleType\Jc;
 class StudentCharacteristicsController extends Controller
 {
@@ -102,11 +99,10 @@ class StudentCharacteristicsController extends Controller
 
         try {
             $filename = 'profiles/characteristic_'.time().'.docx';
-            $path  = 'app/public/' . $filename;
             $phpWord->save(storage_path('app/public/'.$filename), 'Word2007');
 
             $dataToCreate = [
-                'path' => Storage::url($filename),
+                'path' => $filename,
                 'passed' => $data['passed'],
             ];
 
@@ -143,11 +139,14 @@ class StudentCharacteristicsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StudentCharacteristics $studentCharacteristics)
+    public function destroy($id)
     {
-        $path = $studentCharacteristics->path;
-
+        $studentCharacteristics = StudentCharacteristics::query()->findOrFail($id);
+        $filePath = $studentCharacteristics->path;
+        Storage::disk('public')->delete($filePath);
         $studentCharacteristics->delete();
-
+        return response()->json([
+            "message" => "Student characteristics deleted"
+        ],204);
     }
 }

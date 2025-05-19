@@ -20,7 +20,7 @@ class CertificationController extends Controller
      */
     public function index()
     {
-        return CertificationResource::collection(Certification::with('subjects')->paginate());
+        return CertificationResource::collection(Certification::with('subject')->paginate());
     }
 
     /**

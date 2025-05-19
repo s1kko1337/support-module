@@ -20,7 +20,7 @@ class Student extends Model
         return $this->hasOne(StudentCharacteristics::class, 'student_id');
     }
 
-    public function student_certification(): HasMany
+    public function studentCertifications(): HasMany
     {
         return $this->hasMany(StudentCertification::class, 'student_id');
     }

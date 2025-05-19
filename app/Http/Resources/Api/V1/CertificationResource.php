@@ -18,6 +18,7 @@ class CertificationResource extends JsonResource
         return [
             'id' => $this->id,
             'subject_id' => $this->subject_id,
+            'subject_name' => $this->subject->name,
             'date'=> $this->date,
             'created_at' => Carbon::parse($this->created_at,('Y-m-d H:i:s'))->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at,('Y-m-d H:i:s'))->toDateTimeString()

@@ -29,6 +29,9 @@ class StudentResource extends JsonResource
             'characteristic_id' => $this->characteristic_id,
             'education' => $this->education,
             'education_form' => $this->education_form,
+            'student_certifications' => StudentCertificationResource::collection(
+                $this->studentCertifications
+            ),
             'created_at' => Carbon::parse($this->created_at,('Y-m-d H:i:s'))->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at,('Y-m-d H:i:s'))->toDateTimeString()
         ];

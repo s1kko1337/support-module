@@ -13,7 +13,7 @@ class Certification extends Model
     protected $fillable = ['subject_id', 'date'];
     public function subject(): BelongsTo
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id', 'id');
     }
 
     public function studentsCertifications(): HasMany

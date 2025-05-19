@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -15,7 +16,7 @@ class StudentCertification extends Model
 
     public function certification(): BelongsTo
     {
-        return $this->belongsTo(Certification::class);
+        return $this->belongsTo(Certification::class,'certification_id');
     }
 
     public function student(): BelongsTo
