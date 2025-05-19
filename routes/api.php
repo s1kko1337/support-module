@@ -60,8 +60,8 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'ca
     Route::apiResource('certifications', CertificationController::class);
     Route::apiResource('students', StudentController::class);
     Route::prefix('students')->group(function () {
-        Route::post('/report/{id}', [StudentController::class, 'report']);
-        Route::post('/list', [StudentController::class, 'groupList']);
+        Route::post('/groupReport/{id}', [StudentController::class, 'report']);
+        Route::post('/report/{groupId}/{studentId}', [StudentController::class, 'groupList']);
     });
     Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
     Route::apiResource('studentCertifications', StudentCertificationController::class);
