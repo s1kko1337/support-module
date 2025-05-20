@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Students\StoreStudentRequest;
 use App\Http\Requests\Api\V1\Students\UpdateStudentRequest;
+use App\Http\Resources\Api\V1\GroupResource;
 use App\Http\Resources\Api\V1\StudentCertificationResource;
 use App\Http\Resources\Api\V1\StudentCharacteristicResource;
 use App\Http\Resources\Api\V1\StudentResource;
@@ -71,34 +72,34 @@ class StudentController extends Controller
         ],204);
     }
 
-    public function report($id)
+    public function groupReport($groupId)
     {
         $user = Auth::user();
         try {
-            $group = $user->groups()->findOrFail($id);
+            $group = $user->groups()->findOrFail($groupId);
         } catch (\Throwable $th) {
             return response()->json([
                 "message" => "The group is not created or does not belong to you"
             ],404);
         }
-        $students = StudentResource::collection($group->students);
-//        foreach ($students as $student) {
-//            $student->studentCertifications = StudentCertificationResource::collection($student->studentCertifications);
-//        }
+        try {
+            $students = $group->students;
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => "Group have not students",
+                "th" => $th->getMessage()
+            ],404);
+        }
 
         \PhpOffice\PhpWord\Settings::setZipClass(Settings::PCLZIP);
-
         $phpWord = new PhpWord();
 
-        // Стили
+        // Стили документа
         $baseFont = ['name' => 'Times New Roman', 'size' => 14];
-        $paragraphStyle = [
-            'lineHeight' => 1.5,
-            'indentation' => ['firstLine' => 567 * 1.25],
-            'alignment' => Jc::BOTH
-        ];
+        $headerFont = array_merge($baseFont, ['bold' => true]);
+        $paragraphStyle = ['alignment' => Jc::BOTH, 'spaceAfter' => 0];
 
-        // Секция документа
+        // Настройки страницы
         $section = $phpWord->addSection([
             'marginLeft' => 1134,
             'marginRight' => 567,
@@ -106,7 +107,7 @@ class StudentController extends Controller
             'marginBottom' => 1134
         ]);
 
-        // Название учреждения
+        // Шапка документа
         $section->addText(
             self::$universityName,
             array_merge($baseFont, ['underline' => 'single']),
@@ -114,38 +115,78 @@ class StudentController extends Controller
         );
         $section->addTextBreak(2);
 
-        // Заголовок
+        // Заголовок отчета
         $section->addText(
-            'ОТЧЕТ ПО СТУДЕНТУ',
+            'ОТЧЕТ ОБ АТТЕСТАЦИИ ГРУППЫ ' . $group->name,
             array_merge($baseFont, ['bold' => false]),
             ['alignment' => Jc::CENTER]
         );
-        $section->addTextBreak(2);
+        $section->addTextBreak(1);
 
-        $studentText = "Студент " . $student->surname . ' ' . $student->name . ' ' . $student->patronymic . ", " .
-            $student->date_of_birth . " г.р." . ", учебной группы " . $student->group->name;
+        // Основная таблица с данными студента
+        $table = $section->addTable([
+            'borderSize' => 6,
+            'borderColor' => '000000',
+            'cellMargin' => 50,
+            'alignment' => Jc::CENTER
+        ]);
 
-        if (!empty($data['characteristics'])) {
-            $studentText .= " " . $data['characteristics'][0];
-            array_shift($data['characteristics']);
-        }
+        // Заголовки таблицы
+        $table->addRow();
+        $table->addCell(5000)->addText('ФИО', $baseFont, ['alignment' => Jc::CENTER]);
+        $table->addCell(2500)->addText('1 семестр', $baseFont, ['alignment' => Jc::CENTER]);
+        $table->addCell(2500)->addText('2 семестр', $baseFont, ['alignment' => Jc::CENTER]);
 
-        $section->addText($studentText, $baseFont, $paragraphStyle);
+        foreach ($students as $student) {
+            $studentData = StudentResource::make($student);
+            $data = $studentData->toArray(\request());
+            $certifications = $data["student_certifications"]->toArray(\request());
 
-        foreach ($data['characteristics'] as $paragraph) {
-            $section->addText($paragraph, $baseFont, $paragraphStyle);
-            $section->addTextBreak(0);
+            $firstSemesterDebt = false;
+            $secondSemesterDebt = false;
+
+            foreach ($certifications as $cert) {
+                if (!$cert["updated_at"]) continue;
+
+                $date = Carbon::parse($cert["updated_at"]);
+                $month = $date->month;
+
+                // Определение семестра
+                if (($month >= 9 && $month <= 12) || $month == 1) {
+                    if ($cert["passed"] == true) $firstSemesterDebt = true;
+                } elseif ($month >= 2 && $month <= 7) {
+                    if ($cert["passed"] == true) $secondSemesterDebt = true;
+                }
+            }
+
+            // Добавление строки
+            $table->addRow();
+            $table->addCell(5000)->addText(
+                $student["surname"] . ' ' . $student["name"] . ' ' . $student["patronymic"],
+                $baseFont,
+                ['alignment' => Jc::CENTER]
+            );
+
+            $table->addCell(2500)->addText(
+                $firstSemesterDebt ? 'Аттестован' : 'Не аттестован',
+                $baseFont,
+                ['alignment' => Jc::CENTER]
+            );
+            $table->addCell(2500)->addText(
+                $secondSemesterDebt ? 'Аттестован' : 'Не аттестован',
+                $baseFont,
+                ['alignment' => Jc::CENTER]
+            );
         }
 
         // Блок куратора
         $section->addTextBreak(2);
         $section->addText(
-            "Куратор группы " . $student->group->name,
+            "Куратор группы " . $group->name,
             $baseFont,
             ['alignment' => Jc::END]
         );
 
-        $user = Auth::user();
         $section->addText(
             $user->surname . ' ' . $user->name,
             array_merge($baseFont, ['bold' => false]),
@@ -153,28 +194,26 @@ class StudentController extends Controller
         );
 
         try {
-            $filename = 'profiles/characteristic_'.time().'.docx';
+            $filename = 'reports/group_cert_report_'.time().'.docx';
             $phpWord->save(storage_path('app/public/'.$filename), 'Word2007');
 
-            $dataToCreate = [
-                'path' => $filename,
-                'passed' => $data['passed'],
-            ];
+            return response()->download(
+                storage_path('app/public/'.$filename),
+                'group_cert_report_'.$studentData->surname.'.docx'
+            )->deleteFileAfterSend(true);
+//            return response()->json([
+//                "path" => storage_path('app/public/'.$filename)
+//            ],200);
 
-            $studentCharacteristics = StudentCharacteristics::create($dataToCreate);
-
-            return StudentCharacteristicResource::make($studentCharacteristics);
 
         } catch (\Exception $e) {
             Log::error('Document generation error: '.$e->getMessage());
             return response()->json(['error' => 'Document generation failed'], 500);
         }
-        return response()->json([
-            "message" => $students
-        ],200);
+        //return new GroupResource($group);
     }
 
-    public function groupList($groupId, $studentId)
+    public function studentReport($groupId, $studentId)
     {
         $user = Auth::user();
         try {
@@ -234,13 +273,13 @@ class StudentController extends Controller
 
         // Основные данные
         $rows = [
-            ['ФИО', $data["surname"].' '.$data["name"].' '.$data["patronymic"]],
-            ['Дата рождения', $data["date_of_birth"]],
-            ['Телефон', $data["phone_number"]],
-            ['Гражданство', $data["citizenship"]],
-            ['Группа', $data["group_name"]],
-            ['Форма обучения', $data["education_form"]],
-            ['Образование', $data["education"]],
+            ['ФИО', ' ' . $data["surname"].' '.$data["name"].' '.$data["patronymic"]],
+            ['Дата рождения', ' ' . $data["date_of_birth"]],
+            ['Телефон', ' ' . $data["phone_number"]],
+            ['Гражданство', ' ' . $data["citizenship"]],
+            ['Группа', ' ' . $data["group_name"]],
+            ['Форма обучения', ' ' . $data["education_form"]],
+            ['Образование', ' ' . $data["education"]],
         ];
 
         foreach ($rows as $row) {
@@ -266,16 +305,16 @@ class StudentController extends Controller
 
             // Заголовки таблицы сертификаций
             $certTable->addRow();
-            $certTable->addCell(4000)->addText('Аттестация', $headerFont, ['alignment' => Jc::CENTER]);
-            $certTable->addCell(3000)->addText('Статус', $headerFont, ['alignment' => Jc::CENTER]);
-            $certTable->addCell(3000)->addText('Дата сдачи', $headerFont, ['alignment' => Jc::CENTER]);
+            $certTable->addCell(4000)->addText('Аттестация', $baseFont, ['alignment' => Jc::CENTER]);
+            $certTable->addCell(3000)->addText('Статус', $baseFont, ['alignment' => Jc::CENTER]);
+            $certTable->addCell(3000)->addText('Дата аттестации', $baseFont, ['alignment' => Jc::CENTER]);
 
             // Данные сертификаций
             foreach ($certifications as $cert) {
                 $certTable->addRow();
-                $certTable->addCell(4000)->addText($cert["certification_name"], $baseFont);
-                $certTable->addCell(3000)->addText($cert["passed"] ? 'Сдано' : 'Не сдано', $baseFont);
-                $certTable->addCell(3000)->addText(Carbon::parse($cert["updated_at"])->toDateString(), $baseFont);
+                $certTable->addCell(4000)->addText(' ' . $cert["certification_name"], $baseFont, ['alignment' => Jc::CENTER]);
+                $certTable->addCell(3000)->addText( $cert["passed"] ? ' Аттестован' : ' Не аттестован', $baseFont, ['alignment' => Jc::CENTER]);
+                $certTable->addCell(3000)->addText(' ' . Carbon::parse($cert["updated_at"])->toDateString(), $baseFont,['alignment' => Jc::CENTER]);
             }
         }
         // Блок куратора
@@ -310,5 +349,10 @@ class StudentController extends Controller
             return response()->json(['error' => 'Document generation failed'], 500);
         }
         return new StudentResource($student);
+    }
+
+    public function listStudents()
+    {
+
     }
 }

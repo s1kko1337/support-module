@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('group_id')->constrained('groups','id');
             $table->string('name');
-            $table->string('photo');
             $table->string('type'); //['meeting','educational']
             $table->text('result');
             $table->timestamp('date');

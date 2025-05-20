@@ -24,7 +24,6 @@ class StoreEventRequest extends FormRequest
         return [
             'group_id' => 'required|integer|exists:groups,id',
             'name' => 'required|string',
-            'photo' => 'string|nullable',
             'type' => 'required|string',
             'result' => 'required|string',
             'date' => 'date',

@@ -109,36 +109,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Справочная информация -->
-                <div class="mt-8 bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Полезная информация
-                    </h3>
-                    <ul class="space-y-3 text-sm text-gray-600">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>Ссылка для сброса пароля действительна в течение 60 минут</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>Если письмо не пришло, проверьте папку "Спам"</span>
-                        </li>
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span>Если у вас возникли проблемы, обратитесь в <a href="#" class="text-indigo-600 hover:underline">службу поддержки</a></span>
-                        </li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>

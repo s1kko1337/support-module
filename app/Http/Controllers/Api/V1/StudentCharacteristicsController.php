@@ -16,6 +16,7 @@ use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\SimpleType\Jc;
 class StudentCharacteristicsController extends Controller
 {
+    public static string $universityName = 'ФГБОУ ВО "Воронежский государственный технический университет"';
     /**
      * Display a listing of the resource.
      */
@@ -53,7 +54,7 @@ class StudentCharacteristicsController extends Controller
 
         // Название учреждения
         $section->addText(
-            $data['institution'],
+            self::$universityName,
             array_merge($baseFont, ['underline' => 'single']),
             ['alignment' => Jc::END]
         );

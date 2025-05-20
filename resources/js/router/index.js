@@ -6,27 +6,92 @@ import TermsOfUse from '../Components/TermsOfUse.vue';
 import EmailVerification from "../Components/Mail/EmailVerification.vue";
 import EmailVerifyLink from "../Components/Mail/EmailVerifyLink.vue";
 import { useAuthStore } from '../Stores/auth';
-import ToDo from "../Components/ToDo.vue";
+import PersonalOffice from "../Components/PersonalOffice.vue";
 import PasswordResetRequest from "../Components/Auth/PasswordResetRequest.vue";
 import PasswordChange from "../Components/Auth/PasswordChange.vue";
 import PasswordResetForm from "../Components/Auth/PasswordResetForm.vue";
-import Dashboard from "../Components/Dashboard/Dashboard.vue";
-import Categories from "../Components/Dashboard/Categories.vue";
-import Posts from "../Components/Dashboard/Posts.vue";
+import Subjects from "../Components/Subjects.vue";
+import Certifications from "../Components/Certifications.vue";
+import Groups from "../Components/Groups.vue";
+import Events from "../Components/Events.vue";
+import Students from "../Components/Students.vue";
+import StudentsCertifications from "../Components/StudentsCertifications.vue";
+import StudentCharacteristics from "../Components/StudentCharacteristics.vue";
+
 
 const routes = [
-    // {
-    //     path: '/',
-    //     name: 'app',
-    //     component: App,
-    // },
-
     {
         path: '/',
-        name: 'todo',
-        component: ToDo,
+        name: 'personalOffice',
+        component: PersonalOffice,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
     },
-
+    {
+        path: '/subjects',
+        name: 'subjects',
+        component: Subjects,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/certifications',
+        name: 'certifications',
+        component: Certifications,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/groups',
+        name: 'groups',
+        component: Groups,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/events',
+        name: 'events',
+        component: Events,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/students',
+        name: 'students',
+        component: Students,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/studentsCertifications',
+        name: 'studentsCertifications',
+        component: StudentsCertifications,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/studentCharacteristics',
+        name: 'studentCharacteristics',
+        component: StudentCharacteristics,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
     {
         path: '/login',
         name: 'login',
@@ -36,33 +101,6 @@ const routes = [
         path: '/register',
         name: 'register',
         component: Register,
-    },
-    {
-        path: '/dashboard',
-        name: 'dashboard',
-        component: Dashboard,
-        meta: {
-            requiresAuth: true,
-            requiresVerification: true
-        }
-    },
-    {
-        path: '/dashboard/categories',
-        name: 'categories',
-        component: Categories,
-        meta: {
-            requiresAuth: true,
-            requiresVerification: true
-        }
-    },
-    {
-        path: '/dashboard/posts',
-        name: 'posts',
-        component: Posts,
-        meta: {
-            requiresAuth: true,
-            requiresVerification: true
-        }
     },
     {
         path: '/termsofuse',
@@ -155,7 +193,7 @@ router.beforeEach(async (to, from, next) => {
 
     // Если пользователь авторизован и пытается перейти на страницу входа или регистрации
     if (authStore.isAuthenticated && (to.name === 'login' || to.name === 'register')) {
-        next({ name: 'dashboard' });
+        next({ name: 'personalOffice' });
         return;
     }
 

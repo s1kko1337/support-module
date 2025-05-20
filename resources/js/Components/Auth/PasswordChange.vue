@@ -138,66 +138,24 @@
                             </svg>
                             Рекомендации по безопасности
                         </h3>
-                        <ul class="space-y-3 text-sm text-gray-600">
-                            <li class="flex items-start">
-                                <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Используйте не менее 8 символов</span>
-                            </li>
-                            <li class="flex items-start">
-                                <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Комбинируйте буквы верхнего и нижнего регистра, цифры и специальные символы</span>
-                            </li>
-                            <li class="flex items-start">
-                                <svg class="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Не используйте личную информацию (дата рождения, имя и т.д.) в пароле</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- FAQ по смене пароля -->
-                    <div class="bg-indigo-50 rounded-xl shadow-md p-6">
-                        <h3 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Часто задаваемые вопросы
-                        </h3>
-
-                        <div class="space-y-4 text-sm">
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-medium text-indigo-700 mb-2">Как часто нужно менять пароль?</h4>
-                                <p class="text-gray-600">Рекомендуется менять пароль каждые 3-6 месяцев, а также после любого подозрительного действия в вашем аккаунте.</p>
-                            </div>
-
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-medium text-indigo-700 mb-2">Что делать, если я забыл пароль?</h4>
+                        <div class="space-y-3 text-sm text-gray-600">
+                                <h3 class="font-medium text-indigo-700 mb-2">Что делать, если я забыл пароль?</h3>
                                 <p class="text-gray-600">Вы можете воспользоваться функцией
                                     <router-link to="/forgot-password" class="text-indigo-600 hover:text-indigo-800 transition duration-300">
                                         восстановления пароля
                                     </router-link>, указав email, привязанный к вашей учетной записи.
                                 </p>
-                            </div>
-
-                            <div>
-                                <h4 class="font-medium text-indigo-700 mb-2">Безопасно ли хранить пароли?</h4>
-                                <p class="text-gray-600">Мы храним ваши пароли в зашифрованном виде, используя современные алгоритмы хеширования. Ваши данные надежно защищены.</p>
-                            </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { Info } from 'lucide-vue-next';
 
 export default {
     name: 'PasswordChange',

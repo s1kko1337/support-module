@@ -20,7 +20,6 @@ class EventResource extends JsonResource
             'id' => $this->id,
             'group_id' => $this->group_id,
             'name' => $this->name,
-            'photo' => $this->photo,
             'type' => $this->type,
             'result' => $this->result,
             'date' => Carbon::parse($this->date)->format('Y-m-d H:i:s'),

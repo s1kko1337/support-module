@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\StudentCertificationController;
 use App\Http\Controllers\Api\V1\StudentCharacteristicsController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\SubjectsController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,18 +51,18 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(functio
 // Маршруты, требующие верифицированного email
 Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'can:use-Api'])->group(function () {
     Route::get('/user', static function (Request $request) {
-        return $request->user();});
+        return $request->user();
+    });
+    Route::post('/user/update', [UserController::class, 'update']);
     Route::post('password/change', [PasswordResetController::class, 'change']);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('posts', PostController::class);
     Route::apiResource('groups', GroupController::class);
     Route::apiResource('events', EventController::class);
     Route::apiResource('subjects', SubjectsController::class);
     Route::apiResource('certifications', CertificationController::class);
     Route::apiResource('students', StudentController::class);
     Route::prefix('students')->group(function () {
-        Route::post('/groupReport/{id}', [StudentController::class, 'report']);
-        Route::post('/report/{groupId}/{studentId}', [StudentController::class, 'groupList']);
+        Route::get('/groupReport/{id}', [StudentController::class, 'groupReport']);
+        Route::get('/report/{groupId}/{studentId}', [StudentController::class, 'studentReport']);
     });
     Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
     Route::apiResource('studentCertifications', StudentCertificationController::class);

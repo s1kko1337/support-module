@@ -24,7 +24,6 @@ class UpdateEventRequest extends FormRequest
         return [
             'group_id' => 'sometimes|integer|exists:groups,id',
             'name' => 'sometimes|string',
-            'photo' => 'string',
             'type' => 'sometimes|string',
             'result' => 'sometimes|string',
             'date' => 'date',

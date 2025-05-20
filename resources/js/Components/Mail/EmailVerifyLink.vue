@@ -165,7 +165,7 @@ onMounted(async () => {
 
 // Перенаправление в панель управления
 const redirectToDashboard = () => {
-    router.push({ name: 'dashboard' });
+    router.push({ name: 'personalOffice' });
 };
 
 // Перенаправление на страницу входа

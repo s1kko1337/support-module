@@ -35,16 +35,18 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Event $group): EventResource
+    public function show($eventId): EventResource
     {
-        return new EventResource($group);
+        $event = Event::query()->findOrFail($eventId);
+        return new EventResource($event);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEventRequest $request, Event $event): EventResource
+    public function update(UpdateEventRequest $request,  $eventId): EventResource
     {
+        $event = Event::query()->findOrFail($eventId);
         $event->update($request->all());
         return new EventResource($event);
     }

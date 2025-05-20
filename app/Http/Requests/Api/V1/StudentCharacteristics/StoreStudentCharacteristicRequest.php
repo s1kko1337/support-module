@@ -22,7 +22,6 @@ class StoreStudentCharacteristicRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'institution' => 'required|string',
             'student_id' => 'required|int|exists:students,id',
             'characteristics' => 'required|array',
             'passed' => 'required|boolean',

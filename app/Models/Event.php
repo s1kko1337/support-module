@@ -9,7 +9,7 @@ class Event extends Model
 {
     protected $table = 'events';
 
-    protected $fillable = ['group_id', 'name', 'type','photo','result','date'];
+    protected $fillable = ['group_id', 'name', 'type','result','date'];
 
     public function group(): BelongsTo
     {
