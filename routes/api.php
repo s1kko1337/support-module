@@ -1,18 +1,21 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\EmailVerificationController;
-use App\Http\Controllers\Api\V1\PasswordResetController;
+use App\Http\Controllers\Api\V1\CertificationController;
+use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\GroupController;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\StudentCertificationController;
+use App\Http\Controllers\Api\V1\StudentCharacteristicsController;
+use App\Http\Controllers\Api\V1\StudentController;
+use App\Http\Controllers\Api\V1\SubjectsController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
-// Маршрут для получения данных пользователя
-Route::get('/user', static function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 // Публичные маршруты
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
@@ -41,13 +44,29 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum'])->group(functio
 
     // Повторная отправка письма для верификации
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
-        ->middleware('throttle:6,1')
+        ->middleware('throttle:25,1')
         ->name('verification.send');
 });
 
 // Маршруты, требующие верифицированного email
-Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified'])->group(function () {
+Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'can:use-Api'])->group(function () {
+    Route::get('/user', static function (Request $request) {
+        return $request->user();
+    });
+    Route::post('/user/update', [UserController::class, 'update']);
     Route::post('password/change', [PasswordResetController::class, 'change']);
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('posts', PostController::class);
+    Route::apiResource('groups', GroupController::class);
+    Route::apiResource('events', EventController::class);
+    Route::apiResource('subjects', SubjectsController::class);
+    Route::apiResource('certifications', CertificationController::class);
+    Route::apiResource('students', StudentController::class);
+    Route::prefix('students')->group(function () {
+        Route::get('/groupReport/{id}', [StudentController::class, 'groupReport']);
+        Route::get('/report/{groupId}/{studentId}', [StudentController::class, 'studentReport']);
+    });
+    Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
+    Route::prefix('studentCharacteristics')->group(function () {
+    Route::get('/download/{characteristicId}', [StudentCharacteristicsController::class,'download']);
+    });
+    Route::apiResource('studentCertifications', StudentCertificationController::class);
 });

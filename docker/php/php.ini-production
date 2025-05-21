@@ -908,6 +908,7 @@ extension=php_gd2.so
 extension=php_pdo_pgsql.so
 ;extension=php_pdo_sqlite.so
 extension=php_pgsql.so
+extension=zip
 ;extension=php_shmop.so
 
 ; The MIBS data available in the PHP distribution must be installed.

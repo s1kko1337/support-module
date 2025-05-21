@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CustomToken;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(CustomToken::class);
+
         VerifyEmail::createUrlUsing(function ($notifiable) {
             $frontend_url = 'http://localhost'; //В проде убрать
 
@@ -83,7 +86,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api', static function (Request $request) {
-            return Limit::perMinute(50)->
+            return Limit::perMinute(2000)->
             by($request->user()?->id ?: $request->
             ip())->response(
                 function (Request $request, array $headers = []) {

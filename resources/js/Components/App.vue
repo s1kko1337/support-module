@@ -18,10 +18,10 @@
             <div class="container mx-auto px-4 py-3">
                 <div class="flex justify-between items-center">
                     <router-link
-                        :to="{name:'todo'}"
+                        :to="{name:'personalOffice'}"
                         class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
                     >
-                    <span class="text-xl font-bold text-indigo-600">SupportApp</span>
+                    <span class="text-xl font-bold text-indigo-600">Модуль поддержки куратора</span>
                     </router-link>
                     <div class="space-x-6">
                         <!-- Кнопки для гостей -->
@@ -41,7 +41,7 @@
                         <!-- Кнопки для авторизованных пользователей -->
                         <template v-else>
                             <router-link
-                                :to="{name:'get'}"
+                                :to="{name:'personalOffice'}"
                                 class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
                             >Панель управления
                             </router-link>
@@ -50,15 +50,6 @@
                                 class="px-4 py-2 rounded-lg text-gray-700 hover:text-red-600 hover:bg-red-50 transition duration-200"
                             >Выход
                             </button>
-
-                            <!-- Информация о пользователе -->
-                            <span v-if="authStore.user" class="ml-4 px-3 py-2 bg-indigo-50 rounded-lg text-indigo-700">
-                                <router-link
-                                    :to="{name:'passwordChange'}"
-                                    class="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition duration-200"
-                                >{{ authStore.user.email || authStore.user.name }}
-                            </router-link>
-                            </span>
                         </template>
                     </div>
                 </div>
@@ -66,18 +57,16 @@
         </nav>
 
         <!-- Основной контент - с flex-grow для заполнения доступного пространства -->
-        <main class="flex-grow container mx-auto px-4 py-8">
-            <div class="bg-white rounded-lg shadow-lg p-6 h-full">
+        <!--<main class="flex-grow container mx-auto px-4 py-8"> -->
                 <router-view></router-view>
-            </div>
-        </main>
+        <!--</main>-->
 
         <!-- Футер - останется внизу из-за flex-структуры -->
         <footer class="bg-gray-900 text-white py-12 mt-auto">
             <div class="container mx-auto px-6">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <div class="mb-6 md:mb-0">
-                        <h3 class="text-2xl font-bold mb-2">SupportApp</h3>
+                        <h3 class="text-2xl font-bold mb-2">Модуль поддержки куратора</h3>
                         <p class="text-gray-400">© 2025. Все права защищены.</p>
                     </div>
                     <div class="flex flex-wrap justify-center gap-4">
@@ -142,7 +131,6 @@ const redirectIfNeeded = async () => {
     }
 };
 
-
 // Инициализация при монтировании компонента
 onMounted(async () => {
     try {
@@ -177,17 +165,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Базовые стили для обеспечения корректной работы с высотой экрана */
 :root {
     --app-height: 100%;
 }
 
-/* Обеспечиваем плавное изменение тени при скролле */
 .transition-shadow {
     transition: box-shadow 0.3s ease;
 }
 
-/* Стили для улучшения прокрутки (опционально) */
 ::-webkit-scrollbar {
     width: 8px;
 }
