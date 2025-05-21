@@ -17,6 +17,7 @@ import Events from "../Components/Events.vue";
 import Students from "../Components/Students.vue";
 import StudentsCertifications from "../Components/StudentsCertifications.vue";
 import StudentCharacteristics from "../Components/StudentCharacteristics.vue";
+import Reports from "../Components/Reports.vue";
 
 
 const routes = [
@@ -69,6 +70,15 @@ const routes = [
         path: '/students',
         name: 'students',
         component: Students,
+        meta: {
+            requiresAuth: true,
+            requiresVerification: true
+        }
+    },
+    {
+        path: '/reports',
+        name: 'reports',
+        component: Reports,
         meta: {
             requiresAuth: true,
             requiresVerification: true

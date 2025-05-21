@@ -65,5 +65,8 @@ Route::prefix('v1')->middleware(['throttle:api', 'auth:sanctum', 'verified', 'ca
         Route::get('/report/{groupId}/{studentId}', [StudentController::class, 'studentReport']);
     });
     Route::apiResource('studentCharacteristics', StudentCharacteristicsController::class);
+    Route::prefix('studentCharacteristics')->group(function () {
+    Route::get('/download/{characteristicId}', [StudentCharacteristicsController::class,'download']);
+    });
     Route::apiResource('studentCertifications', StudentCertificationController::class);
 });

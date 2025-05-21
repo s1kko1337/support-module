@@ -66,7 +66,7 @@
             <div class="container mx-auto px-6">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                     <div class="mb-6 md:mb-0">
-                        <h3 class="text-2xl font-bold mb-2">SupportApp</h3>
+                        <h3 class="text-2xl font-bold mb-2">Модуль поддержки куратора</h3>
                         <p class="text-gray-400">© 2025. Все права защищены.</p>
                     </div>
                     <div class="flex flex-wrap justify-center gap-4">

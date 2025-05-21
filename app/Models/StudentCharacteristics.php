@@ -12,10 +12,10 @@ class StudentCharacteristics extends Model
 
     protected $table = 'student_characteristics';
 
-    public $fillable = ['path', 'passed'];
+    public $fillable = ['path', 'passed', 'student_id'];
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class,'student_id','id');
     }
 }

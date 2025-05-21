@@ -34,13 +34,6 @@
                                 <RefreshCw class="w-5 h-5 mr-2"/>
                                 Обновить
                             </button>
-                            <div class="flex items-center ml-3">
-                                <span class="text-sm text-gray-600 mr-2">Группировать по группам:</span>
-                                <label class="switch">
-                                    <input type="checkbox" v-model="groupByGroups">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
@@ -70,7 +63,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="font-medium text-gray-900">
-                                            {{ getStudentFio(characteristicStudentMap[characteristic.id]) }}
+                                            {{ characteristic.student_fio }}
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -90,6 +83,9 @@
                                         </button>
                                         <button @click="confirmDelete(characteristic)" class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50">
                                             <Trash2 class="w-5 h-5" />
+                                        </button>
+                                        <button @click="downloadCharacteristic(characteristic)" class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50">
+                                            <Download class="w-5 h-5" />
                                         </button>
                                     </td>
                                 </tr>
@@ -125,7 +121,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="font-medium text-gray-900">
-                                                    {{ getStudentFio(characteristicStudentMap[characteristic.id]) }}
+                                                    {{ characteristic.student_fio }}
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -145,6 +141,9 @@
                                                 </button>
                                                 <button @click="confirmDelete(characteristic)" class="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50">
                                                     <Trash2 class="w-5 h-5" />
+                                                </button>
+                                                <button @click="downloadCharacteristic(characteristic)" class="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50">
+                                                    <Download class="w-5 h-5" />
                                                 </button>
                                             </td>
                                         </tr>
@@ -220,12 +219,10 @@
                             <Info class="text-indigo-600 w-5 h-5 mr-2" />
                             <h4 class="font-semibold text-indigo-700">Информация о студенте</h4>
                         </div>
-                        <p v-if="viewModal.student" class="text-indigo-900">
-                            {{ viewModal.student.surname }} {{ viewModal.student.name }} {{ viewModal.student.patronymic }},
-                            {{ formatDate(viewModal.student.birth_date) }} г.р.,
-                            учебной группы {{ availableGroups.find(g => g.id === viewModal.student.group_id)?.name || '—' }}
+                        <p class="text-indigo-900">
+                            <!-- Показываем ФИО студента из характеристики -->
+                            {{ viewModal.characteristic.student_fio || 'Информация о студенте недоступна' }}
                         </p>
-                        <p v-else class="text-indigo-900">Информация о студенте недоступна</p>
                     </div>
 
                     <div class="mb-6">
@@ -249,6 +246,10 @@
                         </div>
 
                         <div class="flex space-x-3">
+                            <button @click="downloadCharacteristic(viewModal.characteristic)" class="btn-primary">
+                                <Download class="w-5 h-5 mr-2" />
+                                Скачать
+                            </button>
                             <button @click="editCharacteristic(viewModal.characteristic)" class="btn-secondary">
                                 <Edit class="w-5 h-5 mr-2" />
                                 Редактировать
@@ -391,7 +392,7 @@
                         <AlertTriangle class="text-red-500 w-8 h-8 mr-3 flex-shrink-0" />
                         <p class="text-gray-700">
                             Вы уверены, что хотите удалить характеристику студента
-                            <span class="font-semibold">{{ getStudentFio(deleteModal.characteristic?.student_id) }}</span>?
+                            <span class="font-semibold">{{ deleteModal.characteristic.student_fio }}</span>?
                             Это действие нельзя будет отменить.
                         </p>
                     </div>
@@ -457,41 +458,42 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import axios from 'axios';
-import {
-    Plus,
-    RefreshCw,
-    Eye,
-    Edit,
-    Trash2,
-    X,
-    AlertTriangle,
-    Loader2,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    CheckCircle,
-    XCircle,
-    Info
-} from 'lucide-vue-next';
-import { useAuthStore } from '../Stores/auth';
+    import { ref, reactive, computed, onMounted } from 'vue';
+    import axios from 'axios';
+    import {
+        Plus,
+        RefreshCw,
+        Eye,
+        Edit,
+        Trash2,
+        X,
+        AlertTriangle,
+        Loader2,
+        ChevronLeft,
+        ChevronRight,
+        ChevronsLeft,
+        ChevronsRight,
+        CheckCircle,
+        XCircle,
+        Info,
+        Download
+    } from 'lucide-vue-next';
+    import { useAuthStore } from '../Stores/auth';
 
-// Инициализация хранилища аутентификации
-const authStore = useAuthStore();
+    // Инициализация хранилища аутентификации
+    const authStore = useAuthStore();
 
-// Состояние данных
-const characteristics = ref([]);
-const students = ref([]); // Обновленная структура для хранения студентов
-const characteristicStudentMap = ref({}); // Для связи характеристики и студента
-const availableGroups = ref([]);
-const loading = ref(false);
-const formErrors = ref({});
-const groupByGroups = ref(false);
+    // Состояние данных
+    const characteristics = ref([]);
+    const students = ref([]);
+    const characteristicStudentMap = ref({});
+    const availableGroups = ref([]);
+    const loading = ref(false);
+    const formErrors = ref({});
+    const groupByGroups = ref(false);
 
-// Модальное окно для уведомлений (Toast)
-const toast = reactive({
+    // Модальное окно для уведомлений (Toast)
+    const toast = reactive({
     show: false,
     type: 'info', // success, error, info
     title: '',
@@ -499,64 +501,92 @@ const toast = reactive({
     timeout: null
 });
 
-// Вспомогательная функция для получения ФИО студента по ID
-const getStudentFio = (studentId) => {
-    const student = students.value.find(s => s.id === studentId);
-    if (student) {
-        return `${student.surname} ${student.name} ${student.patronymic}`;
-    }
-    return 'Студент не найден';
-};
-
-// Получение информации о студенте по ID характеристики
-const getStudentForCharacteristic = (characteristicId) => {
+    // Получение информации о студенте по ID характеристики
+    const getStudentForCharacteristic = (characteristicId) => {
     const studentId = characteristicStudentMap.value[characteristicId];
+    if (!studentId) return null;
+
     return students.value.find(s => s.id === studentId);
 };
 
-// Группировка характеристик по группам
-const groupedCharacteristics = computed(() => {
-    if (!groupByGroups.value) {
-        return { ungrouped: characteristics.value };
-    }
+    const downloadCharacteristic = async (characteristic) => {
+        try {
+            // Устанавливаем responseType: 'blob' для получения бинарных данных
+            const response = await axios.get(
+                `/api/v1/studentCharacteristics/download/${characteristic.id}`,
+                {
+                    responseType: 'blob'
+                }
+            );
 
-    return characteristics.value.reduce((groups, characteristic) => {
-        // Находим студента, чтобы получить его группу
-        const student = getStudentForCharacteristic(characteristic.id);
-        const groupId = student?.group_id || 'unknown';
-        const groupName = availableGroups.value.find(g => g.id === groupId)?.name || `Группа ${groupId}`;
+            // Создаем URL объект из полученных данных
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = window.URL.createObjectURL(blob);
 
-        if (!groups[groupId]) {
-            groups[groupId] = {
-                id: groupId,
-                name: groupName,
-                characteristics: []
-            };
+            // Создаем временный элемент ссылки для скачивания
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `student_characteristic_${characteristic.id}.docx`);
+            document.body.appendChild(link);
+
+            // Имитируем клик для начала скачивания
+            link.click();
+
+            // Удаляем временный элемент и освобождаем URL
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+
+            showToast('Успешно', 'Файл успешно скачан', 'success');
+        } catch (error) {
+            console.error('Ошибка при скачивании файла:', error);
+            showToast('Ошибка', 'Не удалось скачать файл', 'error');
         }
+    };
 
-        groups[groupId].characteristics.push(characteristic);
-        return groups;
-    }, {});
+    // Группировка характеристик по группам
+    const groupedCharacteristics = computed(() => {
+    if (!groupByGroups.value) {
+    return { ungrouped: { name: 'Все характеристики', characteristics: characteristics.value } };
+}
+
+    const groups = {};
+    characteristics.value.forEach(characteristic => {
+    const student = getStudentForCharacteristic(characteristic.id);
+    const groupId = student?.group_id || 'unknown';
+    const groupName = availableGroups.value.find(g => g.id === groupId)?.name || 'Без группы';
+
+    if (!groups[groupId]) {
+    groups[groupId] = {
+    id: groupId,
+    name: groupName,
+    characteristics: []
+};
+}
+
+    groups[groupId].characteristics.push(characteristic);
 });
 
-// Состояние пагинации для студентов
-const studentsPagination = reactive({
+    return groups;
+});
+
+    // Состояние пагинации для студентов
+    const studentsPagination = reactive({
     current_page: 1,
     last_page: 1,
     per_page: 15,
     total: 0
 });
 
-// Состояние пагинации для характеристик
-const characteristicsPagination = reactive({
+    // Состояние пагинации для характеристик
+    const characteristicsPagination = reactive({
     current_page: 1,
     last_page: 1,
     per_page: 15,
     total: 0
 });
 
-// Вычисляемые страницы для пагинации характеристик
-const displayedPages = computed(() => {
+    // Вычисляемые страницы для пагинации характеристик
+    const displayedPages = computed(() => {
     const pages = [];
     const maxDisplayed = 5;
     const halfMax = Math.floor(maxDisplayed / 2);
@@ -565,335 +595,312 @@ const displayedPages = computed(() => {
     let end = Math.min(characteristicsPagination.last_page, start + maxDisplayed - 1);
 
     if (end - start + 1 < maxDisplayed) {
-        start = Math.max(1, end - maxDisplayed + 1);
-    }
+    start = Math.max(1, end - maxDisplayed + 1);
+}
 
     for (let i = start; i <= end; i++) {
-        pages.push(i);
-    }
+    pages.push(i);
+}
 
     return pages;
 });
 
-// Модальное окно для просмотра характеристики
-const viewModal = reactive({
+    // Модальное окно для просмотра характеристики
+    const viewModal = reactive({
     show: false,
     characteristic: {},
     student: null
 });
 
-// Модальное окно для формы создания/редактирования
-const formModal = reactive({
+    // Модальное окно для формы создания/редактирования
+    const formModal = reactive({
     show: false,
     isEdit: false,
     loading: false,
     form: {
-        student_id: '',
-        characteristics: ['', '', ''],
-        passed: false
-    },
+    student_id: '',
+    characteristics: ['', '', ''],
+    passed: false
+},
     characteristicId: null
 });
 
-// Модальное окно подтверждения удаления
-const deleteModal = reactive({
+    // Модальное окно подтверждения удаления
+    const deleteModal = reactive({
     show: false,
     loading: false,
-    characteristic: {},
-    student: null
+    characteristic: {}
 });
 
-// Функция для форматирования даты
-const formatDate = (dateString) => {
+    // Функция для форматирования даты
+    const formatDate = (dateString) => {
     if (!dateString) return 'Н/Д';
 
     const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    };
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+};
 
     return new Date(dateString).toLocaleDateString('ru-RU', options);
 };
 
-// Функция для получения списка характеристик
-const fetchCharacteristics = async () => {
+    // Функция для получения списка характеристик
+    const fetchCharacteristics = async () => {
     loading.value = true;
     try {
-        const response = await axios.get('/api/v1/studentCharacteristics', {
-            params: {
-                page: characteristicsPagination.current_page,
-                per_page: characteristicsPagination.per_page
-            }
-        });
+    const response = await axios.get('/api/v1/studentCharacteristics', {
+    params: {
+    page: characteristicsPagination.current_page,
+    per_page: characteristicsPagination.per_page
+}
+});
 
-        characteristics.value = response.data.data;
+    characteristics.value = response.data.data;
 
-        // Обновление пагинации
-        characteristicsPagination.current_page = response.data.meta.current_page;
-        characteristicsPagination.last_page = response.data.meta.last_page;
-        characteristicsPagination.total = response.data.meta.total;
-        characteristicsPagination.per_page = response.data.meta.per_page;
+    // Обновление пагинации
+    characteristicsPagination.current_page = response.data.meta.current_page;
+    characteristicsPagination.last_page = response.data.meta.last_page;
+    characteristicsPagination.total = response.data.meta.total;
+    characteristicsPagination.per_page = response.data.meta.per_page;
 
-        // Если текущая страница больше последней, переходим на последнюю
-        if (characteristicsPagination.current_page > characteristicsPagination.last_page && characteristicsPagination.last_page > 0) {
-            changePage(characteristicsPagination.last_page);
-        }
+    // Если текущая страница больше последней, переходим на последнюю
+    if (characteristicsPagination.current_page > characteristicsPagination.last_page && characteristicsPagination.last_page > 0) {
+    changePage(characteristicsPagination.last_page);
+}
 
-        // После получения списка характеристик, обновляем информацию о студентах
-        await fetchStudentsForCharacteristics();
-    } catch (error) {
-        console.error('Ошибка при загрузке характеристик:', error);
-        showToast('error', 'Ошибка загрузки', 'Не удалось загрузить характеристики. Пожалуйста, попробуйте позже.');
-    } finally {
-        loading.value = false;
-    }
+    // Связываем характеристики со студентами
+    mapCharacteristicsToStudents();
+} catch (error) {
+    console.error('Ошибка при загрузке характеристик:', error);
+    showToast('error', 'Ошибка загрузки', 'Не удалось загрузить характеристики. Пожалуйста, попробуйте позже.');
+} finally {
+    loading.value = false;
+}
 };
 
-// Функция для получения студентов с пагинацией
-const fetchStudents = async (page = 1) => {
+    // Функция для получения студентов
+    const fetchStudents = async () => {
     try {
-        const response = await axios.get('/api/v1/students', {
-            params: {
-                page,
-                per_page: studentsPagination.per_page
-            }
-        });
+    const response = await axios.get('/api/v1/students');
+    students.value = response.data.data.map(student => ({
+    ...student,
+    // Создаем полное ФИО для удобства
+    fio: `${student.surname} ${student.name} ${student.patronymic}`
+}));
 
-        // Если это первая страница, инициализируем массив, иначе добавляем к существующему
-        if (page === 1) {
-            students.value = response.data.data;
-        } else {
-            students.value = [...students.value, ...response.data.data];
-        }
+    // Обновление пагинации
+    studentsPagination.current_page = response.data.meta.current_page;
+    studentsPagination.last_page = response.data.meta.last_page;
+    studentsPagination.total = response.data.meta.total;
 
-        // Обновление пагинации
-        studentsPagination.current_page = response.data.meta.current_page;
-        studentsPagination.last_page = response.data.meta.last_page;
-        studentsPagination.total = response.data.meta.total;
-        studentsPagination.per_page = response.data.meta.per_page;
+    // Если есть еще страницы, загружаем их
+    if (response.data.meta.current_page < response.data.meta.last_page) {
+    for (let page = 2; page <= response.data.meta.last_page; page++) {
+    const nextPageResponse = await axios.get('/api/v1/students', {
+    params: { page }
+});
 
-        // Если есть еще страницы, загружаем их
-        if (studentsPagination.current_page < studentsPagination.last_page) {
-            await fetchStudents(studentsPagination.current_page + 1);
-        }
-    } catch (error) {
-        console.error('Ошибка при загрузке студентов:', error);
-        showToast('error', 'Ошибка загрузки', 'Не удалось загрузить список студентов.');
-    }
+    const moreStudents = nextPageResponse.data.data.map(student => ({
+    ...student,
+    fio: `${student.surname} ${student.name} ${student.patronymic}`
+}));
+
+    students.value = [...students.value, ...moreStudents];
+}
+}
+} catch (error) {
+    console.error('Ошибка при загрузке студентов:', error);
+    showToast('error', 'Ошибка загрузки', 'Не удалось загрузить список студентов.');
+}
 };
 
-// Функция для получения информации о студентах для текущих характеристик
-const fetchStudentsForCharacteristics = async () => {
+    // Связывание характеристик со студентами
+    const mapCharacteristicsToStudents = () => {
+    // Сбрасываем текущие связи
+    characteristicStudentMap.value = {};
+
+    // Для каждой характеристики находим студента по characteristic_id
+    characteristics.value.forEach(characteristic => {
+    const student = students.value.find(s => s.characteristic_id === characteristic.id);
+    if (student) {
+    characteristicStudentMap.value[characteristic.id] = student.id;
+}
+});
+};
+
+    // Функция для получения списка групп
+    const fetchGroups = async () => {
     try {
-        // Создаем запрос для каждой характеристики
-        const promises = characteristics.value.map(async (characteristic) => {
-            try {
-                const response = await axios.get(`/api/v1/studentCharacteristics/${characteristic.id}`);
-                if (response.data && response.data.id) {
-                    // Обновляем карту связей
-                    characteristicStudentMap.value[characteristic.id] = response.data.id;
-
-                    // Проверяем, есть ли уже этот студент в нашем списке
-                    const existingStudentIndex = students.value.findIndex(s => s.id === response.data.id);
-                    if (existingStudentIndex === -1) {
-                        students.value.push(response.data);
-                    }
-                }
-            } catch (error) {
-                console.error(`Ошибка при загрузке студента для характеристики ${characteristic.id}:`, error);
-            }
-        });
-
-        await Promise.all(promises);
-    } catch (error) {
-        console.error('Ошибка при загрузке студентов для характеристик:', error);
-    }
+    const response = await axios.get('/api/v1/groups');
+    availableGroups.value = response.data;
+} catch (error) {
+    console.error('Ошибка при загрузке групп:', error);
+    showToast('error', 'Ошибка загрузки', 'Не удалось загрузить список групп.');
+}
 };
 
-// Функция для получения списка групп
-const fetchGroups = async () => {
-    try {
-        const response = await axios.get('/api/v1/groups');
-        availableGroups.value = response.data;
-    } catch (error) {
-        console.error('Ошибка при загрузке групп:', error);
-    }
-};
-
-// Функция для изменения страницы пагинации
-const changePage = (page) => {
+    // Функция для изменения страницы пагинации
+    const changePage = (page) => {
     if (page < 1 || page > characteristicsPagination.last_page || page === characteristicsPagination.current_page) {
-        return;
-    }
+    return;
+}
 
     characteristicsPagination.current_page = page;
     fetchCharacteristics();
 };
 
-// Открытие модального окна для создания новой характеристики
-const openCreateModal = () => {
+    // Открытие модального окна для создания новой характеристики
+    const openCreateModal = () => {
     formModal.isEdit = false;
     formModal.characteristicId = null;
     formModal.form = {
-        student_id: '',
-        characteristics: ['', '', ''],
-        passed: false
-    };
+    student_id: '',
+    characteristics: ['', '', ''],
+    passed: false
+};
     formErrors.value = {};
     formModal.show = true;
 };
 
-// Открытие модального окна для просмотра характеристики
-const viewCharacteristic = (characteristic) => {
+    // Открытие модального окна для просмотра характеристики
+    const viewCharacteristic = (characteristic) => {
     const student = getStudentForCharacteristic(characteristic.id);
 
     viewModal.characteristic = { ...characteristic };
-    viewModal.student = student;
+    viewModal.student = student || null;
     viewModal.show = true;
 };
 
-// Закрытие модального окна просмотра
-const closeViewModal = () => {
+    // Закрытие модального окна просмотра
+    const closeViewModal = () => {
     viewModal.show = false;
     setTimeout(() => {
-        viewModal.characteristic = {};
-        viewModal.student = null;
-    }, 300);
+    viewModal.characteristic = {};
+    viewModal.student = null;
+}, 300);
 };
 
-// Открытие модального окна для редактирования характеристики
-const editCharacteristic = (characteristic) => {
+    // Открытие модального окна для редактирования характеристики
+    const editCharacteristic = (characteristic) => {
     const student = getStudentForCharacteristic(characteristic.id);
 
     formModal.isEdit = true;
     formModal.characteristicId = characteristic.id;
     formModal.form = {
-        student_id: student ? student.id : '',
-        passed: characteristic.passed,
-        // В режиме редактирования мы не отображаем текстовые поля характеристик,
-        // так как документ уже сформирован
-        characteristics: []
-    };
+    student_id: student?.id || '',
+    characteristics: [],
+    passed: characteristic.passed
+};
     formErrors.value = {};
     formModal.show = true;
 
     // Если открыто модальное окно просмотра, закрываем его
     if (viewModal.show) {
-        closeViewModal();
-    }
+    closeViewModal();
+}
 };
 
-// Закрытие модального окна формы
-const closeFormModal = () => {
+    // Закрытие модального окна формы
+    const closeFormModal = () => {
     formModal.show = false;
     setTimeout(() => {
-        formModal.form = {
-            student_id: '',
-            characteristics: ['', '', ''],
-            passed: false
-        };
-        formModal.isEdit = false;
-        formModal.characteristicId = null;
-        formErrors.value = {};
-    }, 300);
+    formModal.form = {
+    student_id: '',
+    characteristics: ['', '', ''],
+    passed: false
+};
+    formModal.isEdit = false;
+    formModal.characteristicId = null;
+    formErrors.value = {};
+}, 300);
 };
 
-// Открытие модального окна для подтверждения удаления
-const confirmDelete = (characteristic) => {
-    const student = getStudentForCharacteristic(characteristic.id);
-
+    // Открытие модального окна для подтверждения удаления
+    const confirmDelete = (characteristic) => {
     deleteModal.characteristic = characteristic;
-    deleteModal.student = student;
     deleteModal.show = true;
 
     // Если открыто модальное окно просмотра, закрываем его
     if (viewModal.show) {
-        closeViewModal();
-    }
+    closeViewModal();
+}
 };
 
-// Закрытие модального окна подтверждения удаления
-const closeDeleteModal = () => {
+    // Закрытие модального окна подтверждения удаления
+    const closeDeleteModal = () => {
     deleteModal.show = false;
     setTimeout(() => {
-        deleteModal.characteristic = {};
-        deleteModal.student = null;
-    }, 300);
+    deleteModal.characteristic = {};
+}, 300);
 };
 
-// Добавление строки в форму характеристики
-const addCharacteristicLine = () => {
-    formModal.form.characteristics.push('');
-};
-
-// Удаление строки из формы характеристики
-const removeCharacteristicLine = (index) => {
-    if (formModal.form.characteristics.length > 1) {
-        formModal.form.characteristics.splice(index, 1);
-    }
-};
-
-// Сохранение характеристики (создание или обновление)
-const saveCharacteristic = async () => {
+    // Сохранение характеристики (создание или обновление)
+    const saveCharacteristic = async () => {
     formModal.loading = true;
     formErrors.value = {};
 
     try {
-        let response;
+    let response;
 
-        if (formModal.isEdit) {
-            // Обновление существующей характеристики
-            response = await axios.put(`/api/v1/studentCharacteristics/${formModal.characteristicId}`, formModal.form);
-            showToast('success', 'Успешно обновлено', 'Характеристика успешно обновлена.');
-        } else {
-            // Создание новой характеристики
-            response = await axios.post('/api/v1/studentCharacteristics', formModal.form);
-            showToast('success', 'Успешно создано', 'Характеристика успешно создана.');
-        }
+    if (formModal.isEdit) {
+    // Обновление существующей характеристики
+    response = await axios.put(`/api/v1/studentCharacteristics/${formModal.characteristicId}`, {
+    passed: formModal.form.passed
+});
+    showToast('success', 'Успешно обновлено', 'Характеристика успешно обновлена.');
+} else {
+    // Создание новой характеристики
+    response = await axios.post('/api/v1/studentCharacteristics', {
+    student_id: formModal.form.student_id,
+    characteristics: formModal.form.characteristics,
+    passed: formModal.form.passed
+});
+    showToast('success', 'Успешно создано', 'Характеристика успешно создана.');
+}
 
-        closeFormModal();
-        fetchCharacteristics();
-    } catch (error) {
-        console.error('Ошибка при сохранении характеристики:', error);
+    closeFormModal();
+    fetchCharacteristics();
+} catch (error) {
+    console.error('Ошибка при сохранении характеристики:', error);
 
-        if (error.response?.status === 422) {
-            // Ошибки валидации
-            formErrors.value = error.response.data.errors || {};
-            showToast('error', 'Ошибка валидации', 'Проверьте правильность заполнения полей формы.');
-        } else {
-            showToast('error', 'Ошибка сохранения', 'Не удалось сохранить характеристику. Пожалуйста, попробуйте позже.');
-        }
-    } finally {
-        formModal.loading = false;
-    }
+    if (error.response?.status === 422) {
+    // Ошибки валидации
+    formErrors.value = error.response.data.errors || {};
+    showToast('error', 'Ошибка валидации', 'Проверьте правильность заполнения полей формы.');
+} else {
+    showToast('error', 'Ошибка сохранения', 'Не удалось сохранить характеристику. Пожалуйста, попробуйте позже.');
+}
+} finally {
+    formModal.loading = false;
+}
 };
 
-// Удаление характеристики
-const deleteCharacteristic = async () => {
+    // Удаление характеристики
+    const deleteCharacteristic = async () => {
     deleteModal.loading = true;
 
     try {
-        await axios.delete(`/api/v1/studentCharacteristics/${deleteModal.characteristic.id}`);
-        showToast('success', 'Успешно удалено', 'Характеристика успешно удалена.');
-        closeDeleteModal();
-        fetchCharacteristics();
-    } catch (error) {
-        console.error('Ошибка при удалении характеристики:', error);
-        showToast('error', 'Ошибка удаления', 'Не удалось удалить характеристику. Пожалуйста, попробуйте позже.');
-    } finally {
-        deleteModal.loading = false;
-    }
+    await axios.delete(`/api/v1/studentCharacteristics/${deleteModal.characteristic.id}`);
+    showToast('success', 'Успешно удалено', 'Характеристика успешно удалена.');
+    closeDeleteModal();
+    fetchCharacteristics();
+} catch (error) {
+    console.error('Ошибка при удалении характеристики:', error);
+    showToast('error', 'Ошибка удаления', 'Не удалось удалить характеристику. Пожалуйста, попробуйте позже.');
+} finally {
+    deleteModal.loading = false;
+}
 };
 
-// Функция для отображения уведомлений
-const showToast = (type, title, message, duration = 5000) => {
+    // Функция для отображения уведомлений
+    const showToast = (type, title, message, duration = 5000) => {
     // Очищаем предыдущий таймаут, если есть
     if (toast.timeout) {
-        clearTimeout(toast.timeout);
-    }
+    clearTimeout(toast.timeout);
+}
 
     // Устанавливаем параметры уведомления
     toast.type = type;
@@ -903,47 +910,45 @@ const showToast = (type, title, message, duration = 5000) => {
 
     // Устанавливаем таймаут для автоматического скрытия
     toast.timeout = setTimeout(() => {
-        hideToast();
-    }, duration);
+    hideToast();
+}, duration);
 };
 
-// Функция для скрытия уведомления
-const hideToast = () => {
+    // Функция для скрытия уведомления
+    const hideToast = () => {
     toast.show = false;
 
     if (toast.timeout) {
-        clearTimeout(toast.timeout);
-        toast.timeout = null;
-    }
+    clearTimeout(toast.timeout);
+    toast.timeout = null;
+}
 };
 
-// Проверка аутентификации и загрузка данных при монтировании компонента
-onMounted(async () => {
+    // Проверка аутентификации и загрузка данных при монтировании компонента
+    onMounted(async () => {
     // Убедимся, что пользователь аутентифицирован
     if (!authStore.isAuthenticated) {
-        // Если пользователь не аутентифицирован, переадресуем на страницу входа
-        // Или показываем соответствующее уведомление
-        showToast('error', 'Требуется авторизация', 'Пожалуйста, войдите в систему для доступа к этой странице.');
-        return;
-    }
+    showToast('error', 'Требуется авторизация', 'Пожалуйста, войдите в систему для доступа к этой странице.');
+    return;
+}
 
     try {
-        loading.value = true;
+    loading.value = true;
 
-        // Загружаем все необходимые данные
-        await Promise.all([
-            fetchStudents(),
-            fetchGroups()
-        ]);
+    // Загружаем данные параллельно
+    await Promise.all([
+    fetchStudents(),
+    fetchGroups()
+    ]);
 
-        // После загрузки вспомогательных данных загружаем характеристики
-        await fetchCharacteristics();
-    } catch (error) {
-        console.error('Ошибка при инициализации страницы:', error);
-        showToast('error', 'Ошибка загрузки', 'Не удалось загрузить необходимые данные. Пожалуйста, обновите страницу.');
-    } finally {
-        loading.value = false;
-    }
+    // После загрузки вспомогательных данных загружаем характеристики
+    await fetchCharacteristics();
+} catch (error) {
+    console.error('Ошибка при инициализации страницы:', error);
+    showToast('error', 'Ошибка загрузки', 'Не удалось загрузить необходимые данные. Пожалуйста, обновите страницу.');
+} finally {
+    loading.value = false;
+}
 });
 </script>
 

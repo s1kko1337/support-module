@@ -104,6 +104,7 @@ class StudentCharacteristicsController extends Controller
 
             $dataToCreate = [
                 'path' => $filename,
+                'student_id'=> $student->id,
                 'passed' => $data['passed'],
             ];
 
@@ -149,5 +150,15 @@ class StudentCharacteristicsController extends Controller
         return response()->json([
             "message" => "Student characteristics deleted"
         ],204);
+    }
+
+    public function download($characteristicId){
+        $characteristic = StudentCharacteristics::query()->findOrFail($characteristicId);
+        $filename = $characteristic->path;
+
+        return response()->download(
+            storage_path('app/public/'.$filename),
+            'student_characteristic_'.$characteristicId . '.docx'
+        );
     }
 }

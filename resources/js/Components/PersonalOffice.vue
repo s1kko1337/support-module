@@ -157,7 +157,7 @@
                 </router-link>
 
                 <!-- Карточка модуля: Отчеты -->
-                <router-link :to="{name:''}" href="#" class="module-card"
+                <router-link :to="{name:'reports'}" href="#" class="module-card"
                              :class="{ 'active': activeModule === 'reports' }" @click="navigateTo('reports')">
                     <div class="icon-wrapper bg-pink-100">
                         <BarChart2 class="w-8 h-8 text-pink-600"/>

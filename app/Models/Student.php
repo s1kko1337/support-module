@@ -17,7 +17,7 @@ class Student extends Model
         'phone_number','citizenship','group_id','characteristic_id','education','education_form'];
     public function characteristic(): HasOne
     {
-        return $this->hasOne(StudentCharacteristics::class, 'student_id');
+        return $this->hasOne(StudentCharacteristics::class);
     }
 
     public function studentCertifications(): HasMany

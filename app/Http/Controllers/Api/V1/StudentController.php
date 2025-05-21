@@ -199,7 +199,7 @@ class StudentController extends Controller
 
             return response()->download(
                 storage_path('app/public/'.$filename),
-                'group_cert_report_'.$studentData->surname.'.docx'
+                'group_cert_report_'.$group->name.'.docx'
             )->deleteFileAfterSend(true);
 //            return response()->json([
 //                "path" => storage_path('app/public/'.$filename)
@@ -335,20 +335,16 @@ class StudentController extends Controller
             $filename = 'reports/student_report_'.time().'.docx';
             $phpWord->save(storage_path('app/public/'.$filename), 'Word2007');
 
-//            return response()->download(
-//                storage_path('app/public/'.$filename),
-//                'Student_Report_'.$studentData->surname.'.docx'
-//            )->deleteFileAfterSend(true);
-//            return response()->json([
-//                "path" => storage_path('app/public/'.$filename)
-//            ],200);
+            return response()->download(
+                storage_path('app/public/'.$filename),
+                'Student_Report_'.$studentData->surname.'.docx'
+            )->deleteFileAfterSend(true);
 
 
         } catch (\Exception $e) {
             Log::error('Document generation error: '.$e->getMessage());
             return response()->json(['error' => 'Document generation failed'], 500);
         }
-        return new StudentResource($student);
     }
 
     public function listStudents()

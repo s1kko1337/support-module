@@ -20,6 +20,7 @@ class StudentCharacteristicResource extends JsonResource
         return [
             'id'=> $this->id,
             'passed' => $this->passed,
+            'student_fio' => $this->student->surname . ' ' . $this->student->name . ' ' . $this->student->patronymic,
             'path' => $this->path,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'updated_at' => Carbon::parse($this->updated_at)->toDateTimeString()
