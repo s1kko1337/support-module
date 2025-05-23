@@ -18,7 +18,6 @@ class GroupController extends Controller
     {
         return GroupResource::collection(Group::with('curator')->paginate());
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -28,8 +27,6 @@ class GroupController extends Controller
         $user = Auth::user();
         $data['curator_id'] = $user->id;
         $group = $user->groups()->create($data);
-
-        //broadcast(new StorePostEvent($post))->toOthers();
 
         return GroupResource::make($group)->resolve();
     }

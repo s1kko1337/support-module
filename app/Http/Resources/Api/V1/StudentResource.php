@@ -26,7 +26,6 @@ class StudentResource extends JsonResource
             'citizenship' => $this->citizenship,
             'group_id' => $this->group_id,
             'group_name' => $this->group->name,
-            'characteristic_id' => $this->characteristic->id,
             'education' => $this->education,
             'education_form' => $this->education_form,
             'student_certifications' => StudentCertificationResource::collection(

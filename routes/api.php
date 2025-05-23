@@ -3,11 +3,9 @@
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
-use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CertificationController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\GroupController;
-use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\StudentCertificationController;
 use App\Http\Controllers\Api\V1\StudentCharacteristicsController;
 use App\Http\Controllers\Api\V1\StudentController;

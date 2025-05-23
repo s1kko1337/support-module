@@ -25,17 +25,13 @@ class AuthController extends Controller
         $role = Role::findByName('curator');
         $user->assignRole($role);
 
-        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
-
         event(new Registered($user));
         return response()->json([
             'user' => $user,
-            //'role' => $role,
             'token' => $user->createToken("Token of user: {$user->name}")->plainTextToken,
         ]);
 
     }
-
 
     /**
      * Логин в приложении с предварительным удалением всех ранее созданных токенов.
