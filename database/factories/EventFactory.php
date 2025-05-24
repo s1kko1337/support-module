@@ -20,7 +20,7 @@ class EventFactory extends Factory
         $category = ['Учебное', 'Внеучебное'];
         return [
             'group_id' => 1,
-            'name' => $this->faker->name(),
+            'name' => $this->faker->word(),
             'type' => $this->faker->randomElement($category),
             'result' => $this->faker->text(),
             'date' => $this->faker->dateTime(),
