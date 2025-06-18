@@ -59,7 +59,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название аттестации</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ФИО студента</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата создания</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата аттестации</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
                                 </tr>
                                 </thead>
@@ -77,7 +77,7 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                        {{ formatDate(certification.created_at) }}
+                                        {{ formatDate(certification.date) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                         <button @click="viewCertification(certification)" class="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50">
@@ -112,7 +112,7 @@
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название аттестации</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ФИО студента</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата создания</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата аттестации</th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
                                         </tr>
                                         </thead>
@@ -130,7 +130,7 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                                {{ formatDate(certification.created_at) }}
+                                                {{ formatDate(certification.date) }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                                 <button @click="viewCertification(certification)" class="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50">
@@ -238,8 +238,8 @@
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="p-4 border border-gray-200 rounded-lg">
-                                <span class="text-sm text-gray-500 font-medium">Дата создания</span>
-                                <div class="text-md font-medium mt-1">{{ formatDate(viewModal.certification.created_at) }}</div>
+                                <span class="text-sm text-gray-500 font-medium">Дата аттестации</span>
+                                <div class="text-md font-medium mt-1">{{ formatDate(viewModal.certification.date) }}</div>
                             </div>
 
                             <div class="p-4 border border-gray-200 rounded-lg">

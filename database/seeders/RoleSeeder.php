@@ -28,6 +28,7 @@ class RoleSeeder extends Seeder
         $curatorRole->givePermissionTo($basicPermission,$curatorPermission);
         $adminRole->givePermissionTo([$basicPermission, $curatorPermission, $adminPermission]);
 
+        // Создаем или обновляем пользователя
         $user = User::firstOrCreate(
             ['email' => 'sikko4890@gmail.com'],
             [
@@ -38,6 +39,7 @@ class RoleSeeder extends Seeder
             ]
         );
 
+        $role = Role::findByName('curator');
         $user->assignRole('curator');
 
         $user->tokens()->delete();

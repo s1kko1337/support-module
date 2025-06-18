@@ -148,7 +148,7 @@ class StudentController extends Controller
             foreach ($certifications as $cert) {
                 if (!$cert["updated_at"]) continue;
 
-                $date = Carbon::parse($cert["updated_at"]);
+                $date = Carbon::parse($cert["date"]);
                 $month = $date->month;
 
                 // Определение семестра
@@ -314,7 +314,7 @@ class StudentController extends Controller
                 $certTable->addRow();
                 $certTable->addCell(4000)->addText(' ' . $cert["certification_name"], $baseFont, ['alignment' => Jc::CENTER]);
                 $certTable->addCell(3000)->addText( $cert["passed"] ? ' Аттестован' : ' Не аттестован', $baseFont, ['alignment' => Jc::CENTER]);
-                $certTable->addCell(3000)->addText(' ' . Carbon::parse($cert["updated_at"])->toDateString(), $baseFont,['alignment' => Jc::CENTER]);
+                $certTable->addCell(3000)->addText(' ' . Carbon::parse($cert["date"])->toDateString(), $baseFont,['alignment' => Jc::CENTER]);
             }
         }
         // Блок куратора
