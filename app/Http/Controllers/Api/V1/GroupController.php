@@ -23,7 +23,7 @@ class GroupController extends Controller
      */
     public function store(StoreGroupRequest $request): array
     {
-        $data = $request->validated();
+        $data = $request->toArray();
         $user = Auth::user();
         $data['curator_id'] = $user->id;
         $group = $user->groups()->create($data);

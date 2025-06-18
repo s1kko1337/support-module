@@ -5,21 +5,15 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Students\StoreStudentRequest;
 use App\Http\Requests\Api\V1\Students\UpdateStudentRequest;
-use App\Http\Resources\Api\V1\GroupResource;
-use App\Http\Resources\Api\V1\StudentCertificationResource;
-use App\Http\Resources\Api\V1\StudentCharacteristicResource;
 use App\Http\Resources\Api\V1\StudentResource;
-use App\Models\Group;
 use App\Models\Student;
-use App\Models\StudentCertification;
-use App\Models\StudentCharacteristics;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\SimpleType\Jc;
+use Symfony\Component\HttpFoundation\Response;
 
 class StudentController extends Controller
 {
@@ -27,7 +21,7 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         return StudentResource::collection(Student::query()->paginate());
     }
@@ -35,10 +29,9 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStudentRequest $request)
+    public function store(StoreStudentRequest $request): StudentResource
     {
-        $data = $request->validated();
-        $student = Student::create($data);
+        $student = Student::create($request);
 
         return StudentResource::make($student);
     }
@@ -46,7 +39,7 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Student $student)
+    public function show(Student $student): StudentResource
     {
         return new StudentResource($student);
     }
@@ -55,21 +48,21 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStudentRequest $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student): StudentResource
     {
-        $student->update($request->validated());
+        $student->update($request->toArray());
         return new StudentResource($student);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Student $student)
+    public function destroy(Student $student): \Illuminate\Http\JsonResponse
     {
         $student->delete();
         return response()->json([
             "message" => "Student deleted"
-        ],204);
+        ], Response::HTTP_NO_CONTENT);
     }
 
     public function groupReport($groupId)
@@ -80,7 +73,7 @@ class StudentController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 "message" => "The group is not created or does not belong to you"
-            ],404);
+            ],Response::HTTP_NOT_FOUND);
         }
         try {
             $students = $group->students;
@@ -88,7 +81,7 @@ class StudentController extends Controller
             return response()->json([
                 "message" => "Group have not students",
                 "th" => $th->getMessage()
-            ],404);
+            ],Response::HTTP_NOT_FOUND);
         }
 
         \PhpOffice\PhpWord\Settings::setZipClass(Settings::PCLZIP);
@@ -96,8 +89,6 @@ class StudentController extends Controller
 
         // Стили документа
         $baseFont = ['name' => 'Times New Roman', 'size' => 14];
-        $headerFont = array_merge($baseFont, ['bold' => true]);
-        $paragraphStyle = ['alignment' => Jc::BOTH, 'spaceAfter' => 0];
 
         // Настройки страницы
         $section = $phpWord->addSection([
@@ -146,16 +137,21 @@ class StudentController extends Controller
             $secondSemesterDebt = false;
 
             foreach ($certifications as $cert) {
-                if (!$cert["updated_at"]) continue;
+                if (!$cert["updated_at"]) {
+                    continue;
+                }
 
                 $date = Carbon::parse($cert["date"]);
                 $month = $date->month;
 
-                // Определение семестра
-                if (($month >= 9 && $month <= 12) || $month == 1) {
-                    if ($cert["passed"] == true) $firstSemesterDebt = true;
+                if (($month >= 9 && $month <= 12) || $month === 1) {
+                    if ($cert["passed"]) {
+                        $firstSemesterDebt = true;
+                    }
                 } elseif ($month >= 2 && $month <= 7) {
-                    if ($cert["passed"] == true) $secondSemesterDebt = true;
+                    if ($cert["passed"]) {
+                        $secondSemesterDebt = true;
+                    }
                 }
             }
 
@@ -201,16 +197,12 @@ class StudentController extends Controller
                 storage_path('app/public/'.$filename),
                 'group_cert_report_'.$group->name.'.docx'
             )->deleteFileAfterSend(true);
-//            return response()->json([
-//                "path" => storage_path('app/public/'.$filename)
-//            ],200);
 
 
         } catch (\Exception $e) {
             Log::error('Document generation error: '.$e->getMessage());
-            return response()->json(['error' => 'Document generation failed'], 500);
+            return response()->json(['error' => 'Document generation failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        //return new GroupResource($group);
     }
 
     public function studentReport($groupId, $studentId)
@@ -222,7 +214,7 @@ class StudentController extends Controller
             return response()->json([
                 "message" => "The group is not created or does not belong to you",
                 "th" => $th->getMessage()
-            ],404);
+            ],Response::HTTP_NOT_FOUND);
         }
         $studentData = StudentResource::make($student);
 
@@ -343,12 +335,7 @@ class StudentController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Document generation error: '.$e->getMessage());
-            return response()->json(['error' => 'Document generation failed'], 500);
+            return response()->json(['error' => 'Document generation failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    public function listStudents()
-    {
-
     }
 }

@@ -12,13 +12,14 @@ use App\Http\Resources\Api\V1\SubjectResource;
 use App\Models\Group;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubjectsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         return SubjectResource::collection(Subject::query()->paginate());
     }
@@ -28,8 +29,7 @@ class SubjectsController extends Controller
      */
     public function store(StoreSubjectRequest $request): array
     {
-        $data = $request->validated();
-        $subject = Subject::create($data);
+        $subject = Subject::create($request->toArray());
 
         return SubjectResource::make($subject)->resolve();
     }
@@ -59,6 +59,6 @@ class SubjectsController extends Controller
         $subject->delete();
         return response()->json([
             "message" => "Subject deleted"
-        ],204);
+        ],Response::HTTP_NO_CONTENT);
     }
 }

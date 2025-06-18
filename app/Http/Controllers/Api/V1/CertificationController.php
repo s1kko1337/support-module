@@ -28,8 +28,7 @@ class CertificationController extends Controller
      */
     public function store(StoreCertificationRequest $request)
     {
-        $data = $request->validated();
-        $event = Certification::create($data);
+        $event = Certification::create($request);
 
         //broadcast(new StorePostEvent($post))->toOthers();
 

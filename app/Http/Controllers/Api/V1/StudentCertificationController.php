@@ -26,8 +26,7 @@ class StudentCertificationController extends Controller
      */
     public function store(StoreStudentCertificationRequest $request)
     {
-        $data = $request->validated();
-        $studentCertification = StudentCertification::create($data);
+        $studentCertification = StudentCertification::create($request);
 
         return new StudentCertificationResource($studentCertification);
     }
@@ -45,7 +44,7 @@ class StudentCertificationController extends Controller
      */
     public function update(UpdateStudentCertificationRequest $request, StudentCertification $studentCertification)
     {
-        $studentCertification->update($request->validated());
+        $studentCertification->update($request->toArray());
         return new StudentCertificationResource($studentCertification);
     }
 

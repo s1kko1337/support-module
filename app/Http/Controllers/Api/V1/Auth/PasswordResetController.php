@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Auth\PasswordChangeRequest;
 use App\Http\Requests\Api\V1\Auth\PasswordResetRequest;
 use App\Http\Requests\Api\V1\Auth\PasswordRevokeRequest;
 use App\Models\User;
@@ -61,20 +62,13 @@ class PasswordResetController extends Controller
     /**
      * Change password for authenticated user
      *
-     * @param Request $request
+     * @param PasswordChangeRequest $request
      * @return JsonResponse
      */
-    public function change(Request $request): JsonResponse
+    public function change(PasswordChangeRequest $request): JsonResponse
     {
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'password_confirmation' => ['required', 'string'],
-        ]);
-
         $user = Auth::user();
 
-        // Проверяем, что текущий пароль соответствует тому, что есть в базе
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'message' => 'Текущий пароль указан неверно.',
@@ -84,7 +78,6 @@ class PasswordResetController extends Controller
             ], 422);
         }
 
-        // Обновляем пароль
         $user->password = Hash::make($request->password);
         $user->save();
 

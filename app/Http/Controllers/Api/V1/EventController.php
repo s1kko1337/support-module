@@ -24,8 +24,7 @@ class EventController extends Controller
      */
     public function store(StoreEventRequest $request)
     {
-        $data = $request->validated();
-        $event = Event::create($data);
+        $event = Event::create($request);
 
         //broadcast(new StorePostEvent($post))->toOthers();
 
